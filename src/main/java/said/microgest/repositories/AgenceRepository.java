@@ -4,47 +4,45 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 import said.microgest.config.HibernateUtil;
-import said.microgest.entities.Operation;
+import said.microgest.entities.Agence;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class OperationRepository {
+public class AgenceRepository {
 
     private final EntityManager em = HibernateUtil.getEntityManager();
 
-    public List<Operation> findAll() {
+    public List<Agence> findAll() {
         try {
-            return em.createQuery("""
-                    SELECT o FROM Operation o
-                    LEFT JOIN FETCH o.adherent
-                    ORDER BY o.dateOperation DESC
-                    """, Operation.class)
-                    .getResultList();
+            return em.createQuery(
+                    "SELECT a FROM Agence a ORDER BY a.id",
+                    Agence.class
+            ).getResultList();
         } catch (PersistenceException e) {
             return new ArrayList<>();
         }
     }
 
-    public Optional<Operation> findById(int id) {
+    public Optional<Agence> findById(int id) {
         try {
-            return Optional.ofNullable(em.find(Operation.class, id));
+            return Optional.ofNullable(em.find(Agence.class, id));
         } catch (PersistenceException e) {
             return Optional.empty();
         }
     }
 
-    public Operation save(Operation operation) {
+    public Agence save(Agence agence) {
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            Operation result;
-            if (operation.getId() == 0) {
-                em.persist(operation);
-                result = operation;
+            Agence result;
+            if (agence.getId() == 0) {
+                em.persist(agence);
+                result = agence;
             } else {
-                result = em.merge(operation);
+                result = em.merge(agence);
             }
             transaction.commit();
             return result;
@@ -60,12 +58,12 @@ public class OperationRepository {
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            Operation operation = em.find(Operation.class, id);
-            if (operation == null) {
+            Agence agence = em.find(Agence.class, id);
+            if (agence == null) {
                 transaction.rollback();
                 return false;
             }
-            em.remove(operation);
+            em.remove(agence);
             transaction.commit();
             return true;
         } catch (PersistenceException e) {
