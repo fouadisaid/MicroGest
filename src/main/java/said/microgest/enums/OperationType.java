@@ -1,4 +1,6 @@
 package said.microgest.enums;
 
-public class OperationType {
+public enum OperationType {
+    DEPOT,
+    RETRAIT
 }

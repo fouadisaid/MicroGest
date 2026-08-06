@@ -1,4 +1,7 @@
 package said.microgest.enums;
 
-public class StatutAdherent {
+public enum StatutAdherent {
+    ACTIF,
+    INACTIF,
+    SUSPENDU
 }

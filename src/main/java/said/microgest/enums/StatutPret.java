@@ -1,4 +1,8 @@
 package said.microgest.enums;
 
-public class StatutPret {
+public enum StatutPret {
+    EN_ATTENTE,
+    VALIDE,
+    REJETE,
+    REMBOURSE
 }
