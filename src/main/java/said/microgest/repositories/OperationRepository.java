@@ -2,11 +2,9 @@ package said.microgest.repositories;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.PersistenceException;
 import said.microgest.config.HibernateUtil;
 import said.microgest.entities.Operation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,64 +13,85 @@ public class OperationRepository {
     private final EntityManager em = HibernateUtil.getEntityManager();
 
     public List<Operation> findAll() {
-        try {
-            return em.createQuery("""
-                    SELECT o FROM Operation o
-                    LEFT JOIN FETCH o.adherent
-                    ORDER BY o.dateOperation DESC
-                    """, Operation.class)
-                    .getResultList();
-        } catch (PersistenceException e) {
-            return new ArrayList<>();
-        }
+        return em.createQuery("""
+                SELECT o FROM Operation o
+                LEFT JOIN FETCH o.adherent
+                ORDER BY o.dateOperation DESC
+                """, Operation.class).getResultList();
+    }
+
+    public List<Operation> findByAdherent(int adherentId) {
+
+        return em.createQuery("""
+                SELECT o FROM Operation o
+                WHERE o.adherent.id=:id
+                ORDER BY o.dateOperation DESC
+                """, Operation.class)
+                .setParameter("id", adherentId)
+                .getResultList();
     }
 
     public Optional<Operation> findById(int id) {
-        try {
-            return Optional.ofNullable(em.find(Operation.class, id));
-        } catch (PersistenceException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(em.find(Operation.class, id));
     }
 
     public Operation save(Operation operation) {
+
         EntityTransaction transaction = em.getTransaction();
+
         try {
+
             transaction.begin();
+
             Operation result;
+
             if (operation.getId() == 0) {
                 em.persist(operation);
                 result = operation;
             } else {
                 result = em.merge(operation);
             }
+
             transaction.commit();
+
             return result;
-        } catch (PersistenceException e) {
-            if (transaction.isActive()) {
+
+        } catch (Exception e) {
+
+            if (transaction.isActive())
                 transaction.rollback();
-            }
-            return null;
+
+            throw new RuntimeException("Erreur lors de l'opération.", e);
         }
     }
 
     public boolean delete(int id) {
+
         EntityTransaction transaction = em.getTransaction();
+
         try {
+
             transaction.begin();
+
             Operation operation = em.find(Operation.class, id);
+
             if (operation == null) {
                 transaction.rollback();
                 return false;
             }
+
             em.remove(operation);
+
             transaction.commit();
+
             return true;
-        } catch (PersistenceException e) {
-            if (transaction.isActive()) {
+
+        } catch (Exception e) {
+
+            if (transaction.isActive())
                 transaction.rollback();
-            }
-            return false;
+
+            throw new RuntimeException("Erreur lors de la suppression.", e);
         }
     }
 }

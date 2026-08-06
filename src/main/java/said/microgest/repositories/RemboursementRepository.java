@@ -2,7 +2,6 @@ package said.microgest.repositories;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.PersistenceException;
 import said.microgest.config.HibernateUtil;
 import said.microgest.entities.Remboursement;
 
@@ -20,9 +19,20 @@ public class RemboursementRepository {
                     SELECT r FROM Remboursement r
                     LEFT JOIN FETCH r.pret
                     ORDER BY r.datePaiement DESC
-                    """, Remboursement.class)
+                    """, Remboursement.class).getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Remboursement> findByPret(int pretId) {
+        try {
+            return em.createQuery(
+                            "SELECT r FROM Remboursement r WHERE r.pret.id = :pretId ORDER BY r.datePaiement ASC",
+                            Remboursement.class
+                    ).setParameter("pretId", pretId)
                     .getResultList();
-        } catch (PersistenceException e) {
+        } catch (Exception e) {
             return new ArrayList<>();
         }
     }
@@ -30,7 +40,7 @@ public class RemboursementRepository {
     public Optional<Remboursement> findById(int id) {
         try {
             return Optional.ofNullable(em.find(Remboursement.class, id));
-        } catch (PersistenceException e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -48,11 +58,11 @@ public class RemboursementRepository {
             }
             transaction.commit();
             return result;
-        } catch (PersistenceException e) {
+        } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            return null;
+            throw new RuntimeException("Erreur lors du remboursement.", e);
         }
     }
 
@@ -68,11 +78,11 @@ public class RemboursementRepository {
             em.remove(remboursement);
             transaction.commit();
             return true;
-        } catch (PersistenceException e) {
+        } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            return false;
+            throw new RuntimeException("Erreur lors de la suppression.", e);
         }
     }
 }
