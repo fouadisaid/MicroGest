@@ -1,6 +1,6 @@
 package said.microgest.enums;
 
-public enum OperationType {
+public enum TypeOperation {
     DEPOT,
     RETRAIT
 }
