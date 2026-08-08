@@ -10,7 +10,9 @@ import said.microgest.entities.Agence;
 import said.microgest.enums.StatutAdherent;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class AdherentRepository {
@@ -255,6 +257,47 @@ public class AdherentRepository {
 
             return Optional.empty();
 
+        }
+    }
+
+    public long countActifs() {
+        try {
+            return em.createQuery(
+                            "SELECT COUNT(a) FROM Adherent a WHERE a.statut = :statut",
+                            Long.class
+                    ).setParameter("statut", StatutAdherent.ACTIF)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public long countByStatut(String statut) {
+        try {
+            return em.createQuery(
+                            "SELECT COUNT(a) FROM Adherent a WHERE a.statut = :statut",
+                            Long.class
+                    ).setParameter("statut", StatutAdherent.valueOf(statut))
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public Map<String, Long> countByAgence() {
+        try {
+            List<Object[]> results = em.createQuery(
+                    "SELECT a.agence.nom, COUNT(a) FROM Adherent a GROUP BY a.agence.nom",
+                    Object[].class
+            ).getResultList();
+
+            Map<String, Long> stats = new HashMap<>();
+            for (Object[] row : results) {
+                stats.put((String) row[0], (Long) row[1]);
+            }
+            return stats;
+        } catch (Exception e) {
+            return new HashMap<>();
         }
     }
 

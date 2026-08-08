@@ -4,7 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import said.microgest.config.HibernateUtil;
 import said.microgest.entities.Operation;
+import said.microgest.enums.TypeOperation;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,6 +95,35 @@ public class OperationRepository {
                 transaction.rollback();
 
             throw new RuntimeException("Erreur lors de la suppression.", e);
+        }
+    }
+
+
+    public long countByDateRange(LocalDateTime debut, LocalDateTime fin) {
+        try {
+            return em.createQuery(
+                            "SELECT COUNT(o) FROM Operation o WHERE o.dateOperation BETWEEN :debut AND :fin",
+                            Long.class
+                    ).setParameter("debut", debut)
+                    .setParameter("fin", fin)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public BigDecimal sumByTypeAndDateRange(TypeOperation type, LocalDateTime debut, LocalDateTime fin) {
+        try {
+            BigDecimal sum = em.createQuery(
+                            "SELECT SUM(o.montant) FROM Operation o WHERE o.type = :type AND o.dateOperation BETWEEN :debut AND :fin",
+                            BigDecimal.class
+                    ).setParameter("type", type)
+                    .setParameter("debut", debut)
+                    .setParameter("fin", fin)
+                    .getSingleResult();
+            return sum != null ? sum : BigDecimal.ZERO;
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
         }
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.NoResultException;
 import said.microgest.config.HibernateUtil;
 import said.microgest.entities.Epargne;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,6 +100,18 @@ public class EpargneRepository {
                 transaction.rollback();
 
             throw new RuntimeException("Erreur lors de la suppression.", e);
+        }
+    }
+
+    public BigDecimal getTotalEpargne() {
+        try {
+            BigDecimal sum = em.createQuery(
+                    "SELECT SUM(e.solde) FROM Epargne e",
+                    BigDecimal.class
+            ).getSingleResult();
+            return sum != null ? sum : BigDecimal.ZERO;
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
         }
     }
 }
