@@ -52,6 +52,33 @@ public class OperationService {
         return saved;
     }
 
+
+    public Operation update(Operation operation) {
+        Operation oldOperation = operationRepository.findById(operation.getId())
+                .orElseThrow(() -> new RuntimeException("Opération introuvable."));
+
+        validate(operation);
+
+        Adherent adherent = adherentRepository.findById(operation.getAdherent().getId())
+                .orElseThrow(() -> new RuntimeException("Adhérent introuvable."));
+
+        operation.setAdherent(adherent);
+
+        operation.setCreatedAt(oldOperation.getCreatedAt());
+        operation.setCreatedBy(oldOperation.getCreatedBy());
+
+
+        boolean montantModifie = oldOperation.getMontant().compareTo(operation.getMontant()) != 0;
+        boolean typeModifie = oldOperation.getType() != operation.getType();
+
+        if (montantModifie || typeModifie) {
+            annulerOperationSurEpargne(oldOperation);
+            updateEpargne(operation);  // Appliquer la nouvelle opération 
+        }
+
+        return operationRepository.save(operation);
+    }
+
     public Operation depot(int adherentId, BigDecimal montant, String observation) {
         if (montant == null || montant.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Le montant du dépôt doit être supérieur à zéro.");
@@ -105,6 +132,19 @@ public class OperationService {
             epargne.setSolde(epargne.getSolde().add(operation.getMontant()));
         } else if (operation.getType() == TypeOperation.RETRAIT) {
             epargne.setSolde(epargne.getSolde().subtract(operation.getMontant()));
+        }
+
+        epargneRepository.save(epargne);
+    }
+
+    private void annulerOperationSurEpargne(Operation operation) {
+        Epargne epargne = epargneRepository.findByAdherent(operation.getAdherent().getId())
+                .orElseThrow(() -> new RuntimeException("Aucune épargne trouvée pour cet adhérent."));
+
+        if (operation.getType() == TypeOperation.DEPOT) {
+            epargne.setSolde(epargne.getSolde().subtract(operation.getMontant()));
+        } else if (operation.getType() == TypeOperation.RETRAIT) {
+            epargne.setSolde(epargne.getSolde().add(operation.getMontant()));
         }
 
         epargneRepository.save(epargne);
