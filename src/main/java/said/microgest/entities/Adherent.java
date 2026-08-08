@@ -57,4 +57,8 @@ public class Adherent extends BaseEntity {
 
     @OneToMany(mappedBy = "adherent", fetch = FetchType.LAZY)
     private List<Pret> prets;
+
+    public String getFullName() {
+        return this.prenom + " " + this.nom.toUpperCase();
+    }
 }

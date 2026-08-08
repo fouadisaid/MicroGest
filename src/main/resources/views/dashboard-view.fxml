@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="said.microgest.controllers.DashboardController"
+      stylesheets="/css/application.css">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label text="📊 Tableau de Bord" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+    <!-- Indicateurs clés -->
+    <GridPane hgap="15" vgap="10">
+        <padding>
+            <Insets top="10" bottom="10"/>
+        </padding>
+
+        <Label text="👥 Total adhérents :" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+        <Label fx:id="totalAdherentsLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-size: 16px;"/>
+
+        <Label text="💰 Total épargne :" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+        <Label fx:id="totalEpargneLabel" GridPane.columnIndex="3" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-text-fill: #27ae60;"/>
+
+        <Label text="🏦 Total prêts validés :" GridPane.columnIndex="4" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+        <Label fx:id="totalPretsLabel" GridPane.columnIndex="5" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-text-fill: #2980b9;"/>
+
+        <Label text="📈 Opérations du mois :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+        <Label fx:id="operationsMoisLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-size: 16px;"/>
+
+        <Label text="📥 Dépôts du mois :" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+        <Label fx:id="depotsMoisLabel" GridPane.columnIndex="3" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-text-fill: #27ae60;"/>
+
+        <Label text="📤 Retraits du mois :" GridPane.columnIndex="4" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+        <Label fx:id="retraitsMoisLabel" GridPane.columnIndex="5" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-text-fill: #e74c3c;"/>
+
+        <Separator GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="6"/>
+
+        <Label text="⏳ Prêts en attente :" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+        <Label fx:id="pretsEnAttenteLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-text-fill: #f39c12;"/>
+
+        <Label text="✅ Prêts validés :" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+        <Label fx:id="pretsValidesLabel" GridPane.columnIndex="3" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-text-fill: #27ae60;"/>
+
+        <Label text="🔁 Prêts remboursés :" GridPane.columnIndex="4" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+        <Label fx:id="pretsRemboursesLabel" GridPane.columnIndex="5" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-text-fill: #2980b9;"/>
+
+        <Label text="❌ Prêts rejetés :" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+        <Label fx:id="pretsRejetesLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-font-size: 16px; -fx-text-fill: #e74c3c;"/>
+    </GridPane>
+
+    <!-- Graphiques -->
+    <HBox spacing="20" alignment="CENTER" VBox.vgrow="ALWAYS">
+        <PieChart fx:id="statutPieChart" prefWidth="350" prefHeight="350"/>
+        <PieChart fx:id="agencePieChart" prefWidth="350" prefHeight="350"/>
+    </HBox>
+
+</VBox>

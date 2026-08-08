@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="said.microgest.controllers.OperationController"
+      stylesheets="/css/application.css">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label text="💰 Gestion des Opérations" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="operationTable" VBox.vgrow="ALWAYS" prefHeight="250">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="40"/>
+            <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+            <TableColumn fx:id="montantColumn" text="Montant" prefWidth="150"/>
+            <TableColumn fx:id="dateColumn" text="Date" prefWidth="180"/>
+            <TableColumn fx:id="observationColumn" text="Observation" prefWidth="300"/>
+            <TableColumn fx:id="adherentColumn" text="Adhérent" prefWidth="200"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <TitledPane text="Formulaire Opération" expanded="false">
+        <GridPane hgap="10" vgap="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Label text="Type :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ComboBox fx:id="typeCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200"/>
+
+            <Label text="Montant :" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <TextField fx:id="montantField" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200"/>
+
+            <Label text="Adhérent :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <ComboBox fx:id="adherentCombo" Grid

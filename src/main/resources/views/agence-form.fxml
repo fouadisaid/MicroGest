@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="said.microgest.controllers.AgenceController"
+      stylesheets="/css/application.css">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label text="🏢 Gestion des Agences" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="agenceTable" VBox.vgrow="ALWAYS" prefHeight="250">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="40"/>
+            <TableColumn fx:id="nomColumn" text="Nom" prefWidth="200"/>
+            <TableColumn fx:id="adresseColumn" text="Adresse" prefWidth="300"/>
+            <TableColumn fx:id="telephoneColumn" text="Téléphone" prefWidth="120"/>
+            <TableColumn fx:id="emailColumn" text="Email" prefWidth="200"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <TitledPane text="Formulaire Agence" expanded="false">
+        <GridPane hgap="10" vgap="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Label text="Nom :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="nomField" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="300"/>
+
+            <Label text="Adresse :" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <TextField fx:id="adresseField" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="300"/>
+
+            <Label text="Téléphone :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <TextField fx:id="telephoneField" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="300"/>
+
+            <Label text="Email :" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="300"/>
+
+            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                <Button fx:id="saveButton" text="💾 Enregistrer" onAction="#handleSave" styleClass="btn-success"/>
+                <Button fx:id="cancelButton" text="❌ Annuler" onAction="#handleCancel" styleClass="btn-secondary"/>
+                <Button fx:id="deleteButton" text="🗑️ Supprimer" onAction="#handleDelete" styleClass="btn-danger"/>
+            </HBox>
+        </GridPane>
+    </TitledPane>
+</VBox>

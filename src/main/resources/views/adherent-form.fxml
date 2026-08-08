@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="said.microgest.controllers.AdherentController"
+      stylesheets="/css/application.css">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- Titre -->
+    <Label text="👤 Gestion des Adhérents" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <!-- Barre de recherche + Filtres -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="🔍 Rechercher..." HBox.hgrow="ALWAYS" prefWidth="250"/>
+
+        <Separator orientation="VERTICAL" />
+
+        <Label text="Statut :"/>
+        <ComboBox fx:id="statutFilter" prefWidth="120"/>
+
+        <Label text="Agence :"/>
+        <ComboBox fx:id="agenceFilter" prefWidth="150"/>
+
+        <Label text="Du :"/>
+        <DatePicker fx:id="dateDebutFilter" prefWidth="120"/>
+
+        <Label text="Au :"/>
+        <DatePicker fx:id="dateFinFilter" prefWidth="120"/>
+
+        <Button text="🔍 Appliquer" onAction="#applyFilters" styleClass="btn-primary"/>
+        <Button text="↺ Réinitialiser" onAction="#resetFilters" styleClass="btn-secondary"/>
+    </HBox>
+
+    <!-- Tableau -->
+    <TableView fx:id="adherentTable" VBox.vgrow="ALWAYS" prefHeight="300">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="40"/>
+            <TableColumn fx:id="numeroColumn" text="N° Adhérent" prefWidth="100"/>
+            <TableColumn fx:id="nomColumn" text="Nom" prefWidth="120"/>
+            <TableColumn fx:id="prenomColumn" text="Prénom" prefWidth="120"/>
+            <TableColumn fx:id="emailColumn" text="Email" prefWidth="180"/>
+            <TableColumn fx:id="telephoneColumn" text="Téléphone" prefWidth="120"/>
+            <TableColumn fx:id="statutColumn" text="Statut" prefWidth="100"/>
+            <TableColumn fx:id="agenceColumn" text="Agence" prefWidth="150"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Pagination -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Label text="Afficher :"/>
+        <ComboBox fx:id="sizeCombo" prefWidth="70"/>
+        <Label text="éléments"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="prevButton" text="◀ Précédent"/>
+        <Label text="Page"/>
+        <Label fx:id="pageLabel" text="1" style="-fx-font-weight: bold;"/>
+        <Label text="/"/>
+        <Label fx:id="totalPagesLabel" text="1"/>
+        <Button fx:id="nextButton" text="Suivant ▶"/>
+
+        <Separator orientation="VERTICAL"/>
+
+        <Label text="Total :"/>
+        <Label fx:id="totalRecordsLabel" text="0" style="-fx-font-weight: bold;"/>
+        <Label text="enregistrements"/>
+    </HBox>
+
+    <!-- Formulaire -->
+    <TitledPane text="Formulaire Adhérent" expanded="false">
+        <GridPane hgap="10" vgap="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <!-- Ligne 1 -->
+            <Label text="N° Adhérent :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="numeroField" GridPane.columnIndex="1" GridPane.rowIndex="0" editable="false"/>
+
+            <Label text="Nom :" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            <TextField fx:id="nomField" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+            <Label text="Prénom :" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+            <TextField fx:id="prenomField" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
+
+            <!-- Ligne 2 -->
+            <Label text="Sexe :" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ComboBox fx:id="sexeCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="100"/>
+
+            <Label text="Date naissance :" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+            <DatePicker fx:id="dateNaissancePicker" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+            <Label text="Téléphone :" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+            <TextField fx:id="telephoneField" GridPane.columnIndex="5" GridPane.rowIndex="1"/>
+
+            <!-- Ligne 3 -->
+            <Label text="Email :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="200"/>
+
+            <Label text="Adresse :" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            <TextField fx:id="adresseField" GridPane.columnIndex="3" GridPane.rowIndex="2" prefWidth="200"/>
+
+            <!-- Ligne 4 -->
+            <Label text="Date adhésion :" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <DatePicker fx:id="dateAdhesionPicker" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="Statut :" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+            <ComboBox fx:id="statutCombo" GridPane.columnIndex="3" GridPane.rowIndex="3" prefWidth="150"/>
+
+            <Label text="Agence :" GridPane.columnIndex="4" GridPane.rowIndex="3"/>
+            <ComboBox fx:id="agenceCombo" GridPane.columnIndex="5" GridPane.rowIndex="3" prefWidth="200"/>
+
+            <!-- Boutons -->
+            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="6">
+                <Button fx:id="saveButton" text="💾 Enregistrer" onAction="#handleSave" styleClass="btn-success"/>
+                <Button fx:id="cancelButton" text="❌ Annuler" onAction="#handleCancel" styleClass="btn-secondary"/>
+                <Button fx:id="deleteButton" text="🗑️ Supprimer" onAction="#handleDelete" styleClass="btn-danger"/>
+                <Button fx:id="toggleStatutButton" text="🔄 Changer statut" onAction="#handleToggleStatut" styleClass="btn-warning"/>
+            </HBox>
+        </GridPane>
+    </TitledPane>
+</VBox>
