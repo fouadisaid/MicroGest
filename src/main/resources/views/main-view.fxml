@@ -31,12 +31,12 @@
 
             <Label text="MENU" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
 
-            <Button text="📊 Tableau de bord" onAction="#showDashboard" styleClass="menu-button"/>
-            <Button text="👤 Adhérents" onAction="#showAdherents" styleClass="menu-button"/>
-            <Button text="💰 Opérations" onAction="#showOperations" styleClass="menu-button"/>
-            <Button text="🏦 Prêts" onAction="#showPrets" styleClass="menu-button"/>
-            <Button text="🏢 Agences" onAction="#showAgences" styleClass="menu-button"/>
-            <Button text="👥 Utilisateurs" onAction="#showUsers" styleClass="menu-button"/>
+            <Button fx:id="dashboardButton" text="📊 Tableau de bord" onAction="#showDashboard" styleClass="menu-button"/>
+            <Button fx:id="adherentsButton" text="👤 Adhérents" onAction="#showAdherents" styleClass="menu-button"/>
+            <Button fx:id="operationsButton" text="💰 Opérations" onAction="#showOperations" styleClass="menu-button"/>
+            <Button fx:id="pretsButton" text="🏦 Prêts" onAction="#showPrets" styleClass="menu-button"/>
+            <Button fx:id="agencesButton" text="🏢 Agences" onAction="#showAgences" styleClass="menu-button"/>
+            <Button fx:id="usersButton" text="👥 Utilisateurs" onAction="#showUsers" styleClass="menu-button"/>
 
             <Region VBox.vgrow="ALWAYS"/>
 
