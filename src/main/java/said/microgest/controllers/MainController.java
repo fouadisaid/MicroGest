@@ -9,7 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import said.microgest.entities.User;
+import said.microgest.enums.Permissions;
 import said.microgest.enums.Role;
 import said.microgest.utils.AlertUtil;
 import said.microgest.utils.SessionContext;
@@ -30,7 +32,6 @@ public class MainController {
     @FXML
     private VBox menuContainer;
 
-    // Boutons du menu
     @FXML
     private Button dashboardButton;
 
@@ -49,126 +50,225 @@ public class MainController {
     @FXML
     private Button usersButton;
 
+    @FXML
+    private Button parametrageButton;
+
     private User currentUser;
+    private Role currentRole;
 
     @FXML
     public void initialize() {
+
         currentUser = SessionContext.getCurrentUser();
 
         if (currentUser != null) {
             userLabel.setText(currentUser.getFullName());
             roleLabel.setText(currentUser.getRole().name());
+            currentRole = currentUser.getRole();
         }
 
         configurerMenu();
+
         chargerVue("/views/dashboard-view.fxml");
     }
 
     private void configurerMenu() {
-        if (currentUser == null) {
+
+        if (currentRole == null) {
             return;
         }
 
-        Role role = currentUser.getRole();
+        dashboardButton.setVisible(
+                currentRole.hasPermission(Permissions.VIEW_DASHBOARD)
+        );
 
-        // Par défaut, tout le monde voit Dashboard, Adhérents, Opérations, Prêts
-        // Seul l'ADMIN voit Agences et Utilisateurs
+        adherentsButton.setVisible(
+                currentRole.hasPermission(Permissions.MANAGE_ADHERENTS)
+        );
 
-        switch (role) {
-            case ADMIN:
-                // ADMIN voit tout
-                dashboardButton.setVisible(true);
-                adherentsButton.setVisible(true);
-                operationsButton.setVisible(true);
-                pretsButton.setVisible(true);
-                agencesButton.setVisible(true);
-                usersButton.setVisible(true);
-                break;
+        operationsButton.setVisible(
+                currentRole.hasPermission(Permissions.MANAGE_OPERATIONS)
+        );
 
-            case AGENT:
-                // AGENT voit tout sauf Agences et Utilisateurs
-                dashboardButton.setVisible(true);
-                adherentsButton.setVisible(true);
-                operationsButton.setVisible(true);
-                pretsButton.setVisible(true);
-                agencesButton.setVisible(false);
-                usersButton.setVisible(false);
-                break;
+        pretsButton.setVisible(
+                currentRole.hasPermission(Permissions.MANAGE_PRETS)
+        );
 
-            case SUPERVISEUR:
-                // SUPERVISEUR voit Dashboard, Opérations, Prêts
-                dashboardButton.setVisible(true);
-                adherentsButton.setVisible(false);
-                operationsButton.setVisible(true);
-                pretsButton.setVisible(true);
-                agencesButton.setVisible(false);
-                usersButton.setVisible(false);
-                break;
+        agencesButton.setVisible(
+                currentRole.hasPermission(Permissions.MANAGE_AGENCES)
+        );
 
-            default:
-                // Par sécurité, on cache tout
-                dashboardButton.setVisible(false);
-                adherentsButton.setVisible(false);
-                operationsButton.setVisible(false);
-                pretsButton.setVisible(false);
-                agencesButton.setVisible(false);
-                usersButton.setVisible(false);
-                break;
-        }
+        usersButton.setVisible(
+                currentRole.hasPermission(Permissions.MANAGE_USERS)
+        );
+
+        parametrageButton.setVisible(
+                currentRole.hasPermission(Permissions.MANAGE_SETTINGS)
+        );
     }
 
     @FXML
     private void showDashboard() {
-        chargerVue("/views/dashboard-view.fxml");
+
+        verifierPermissionEtCharger(
+                Permissions.VIEW_DASHBOARD,
+                "/views/dashboard-view.fxml"
+        );
     }
 
     @FXML
     private void showAdherents() {
-        chargerVue("/views/adherent-form.fxml");
+
+        verifierPermissionEtCharger(
+                Permissions.MANAGE_ADHERENTS,
+                "/views/adherent-form.fxml"
+        );
     }
 
     @FXML
     private void showOperations() {
-        chargerVue("/views/operation-form.fxml");
+
+        verifierPermissionEtCharger(
+                Permissions.MANAGE_OPERATIONS,
+                "/views/operation-form.fxml"
+        );
     }
 
     @FXML
     private void showPrets() {
-        chargerVue("/views/pret-form.fxml");
+
+        verifierPermissionEtCharger(
+                Permissions.MANAGE_PRETS,
+                "/views/pret-form.fxml"
+        );
     }
 
     @FXML
     private void showAgences() {
-        chargerVue("/views/agence-form.fxml");
+
+        verifierPermissionEtCharger(
+                Permissions.MANAGE_AGENCES,
+                "/views/agence-form.fxml"
+        );
     }
 
     @FXML
     private void showUsers() {
-        chargerVue("/views/user-form.fxml");
+
+        verifierPermissionEtCharger(
+                Permissions.MANAGE_USERS,
+                "/views/user-form.fxml"
+        );
+    }
+
+    @FXML
+    private void showParametrage() {
+
+        verifierPermissionEtCharger(
+                Permissions.MANAGE_SETTINGS,
+                "/views/settings-view.fxml"
+        );
+    }
+
+    private void verifierPermissionEtCharger(
+            Permissions permission,
+            String fxmlPath
+    ) {
+
+        if (currentRole == null ||
+                !currentRole.hasPermission(permission)) {
+
+            AlertUtil.error(
+                    "Accès refusé",
+                    "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité."
+            );
+
+            return;
+        }
+
+        chargerVue(fxmlPath);
+    }
+
+    private void chargerVue(String fxmlPath) {
+
+        try {
+
+            var resource =
+                    getClass().getResource(fxmlPath);
+
+            if (resource == null) {
+
+                throw new RuntimeException(
+                        "Fichier FXML introuvable : " + fxmlPath
+                );
+            }
+
+            FXMLLoader loader =
+                    new FXMLLoader(resource);
+
+            Parent content =
+                    loader.load();
+
+            mainPane.setCenter(content);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible de charger la vue : "
+                            + fxmlPath
+                            + "\n\nCause : "
+                            + e.getMessage()
+            );
+        }
     }
 
     @FXML
     private void handleLogout() {
+
         SessionContext.clear();
 
         try {
-            Scene currentScene = mainPane.getScene();
+
+            Scene currentScene =
+                    mainPane.getScene();
 
             if (currentScene == null) {
-                AlertUtil.error("Erreur", "Impossible de trouver la scène courante.");
+
+                AlertUtil.error(
+                        "Erreur",
+                        "Impossible de trouver la scène courante."
+                );
+
                 return;
             }
 
-            Stage stage = (Stage) currentScene.getWindow();
+            Stage stage =
+                    (Stage) currentScene.getWindow();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/login-view.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(
+                                    "/views/login-view.fxml"
+                            )
+                    );
 
-            Scene scene = new Scene(root, 500, 400);
-            String css = getClass().getResource("/css/application.css").toExternalForm();
-            if (css != null) {
-                scene.getStylesheets().add(css);
-            }
+            Parent root =
+                    loader.load();
+
+            Scene scene =
+                    new Scene(root, 500, 400);
+
+            String css =
+                    getClass()
+                            .getResource(
+                                    "/css/application.css"
+                            )
+                            .toExternalForm();
+
+            scene.getStylesheets().add(css);
 
             stage.setScene(scene);
             stage.setTitle("MicroGest - Connexion");
@@ -177,22 +277,23 @@ public class MainController {
             stage.show();
 
         } catch (IOException e) {
-            e.printStackTrace();
-            AlertUtil.error("Erreur", "Impossible de charger l'écran de connexion.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertUtil.error("Erreur", "Erreur lors de la déconnexion : " + e.getMessage());
-        }
-    }
 
-    private void chargerVue(String fxmlPath) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent content = loader.load();
-            mainPane.setCenter(content);
-        } catch (IOException e) {
             e.printStackTrace();
-            AlertUtil.error("Erreur", "Impossible de charger la vue : " + fxmlPath);
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible de charger l'écran de connexion."
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Erreur lors de la déconnexion : "
+                            + e.getMessage()
+            );
         }
     }
 }
