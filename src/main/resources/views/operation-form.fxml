@@ -1,45 +1,266 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="10" xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="said.microgest.controllers.OperationController"
-      stylesheets="/css/application.css">
+<StackPane fx:id="rootPane"
+           xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="said.microgest.controllers.OperationController"
+           style="-fx-background-color: #ecf0f1;">
 
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
+    <!-- ============================================================ -->
+    <!-- LISTE -->
+    <!-- ============================================================ -->
 
-    <Label text="💰 Gestion des Opérations" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <VBox fx:id="listPane"
+          spacing="15"
+          style="-fx-padding: 24;">
 
-    <TableView fx:id="operationTable" VBox.vgrow="ALWAYS" prefHeight="250">
-        <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="40"/>
-            <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
-            <TableColumn fx:id="montantColumn" text="Montant" prefWidth="150"/>
-            <TableColumn fx:id="dateColumn" text="Date" prefWidth="180"/>
-            <TableColumn fx:id="observationColumn" text="Observation" prefWidth="300"/>
-            <TableColumn fx:id="adherentColumn" text="Adhérent" prefWidth="200"/>
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-        </columnResizePolicy>
-    </TableView>
+        <HBox alignment="CENTER_LEFT"
+              spacing="10">
 
-    <TitledPane text="Formulaire Opération" expanded="false">
-        <GridPane hgap="10" vgap="10">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
+            <Label text="Gestion des opérations"
+                   style="-fx-font-size: 22; -fx-font-weight: bold;"/>
 
-            <Label text="Type :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <ComboBox fx:id="typeCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200"/>
+            <Region HBox.hgrow="ALWAYS"/>
 
-            <Label text="Montant :" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <TextField fx:id="montantField" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200"/>
+            <Button fx:id="addButton"
+                    text="+ Ajouter une opération"
+                    onAction="#handleAdd"
+                    style="-fx-background-color: #27ae60;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-padding: 8 18 8 18;"/>
+        </HBox>
 
-            <Label text="Adhérent :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="adherentCombo" Grid
+
+        <HBox spacing="10">
+
+            <TextField fx:id="searchField"
+                       promptText="Rechercher une opération..."
+                       onAction="#handleSearch"
+                       HBox.hgrow="ALWAYS"/>
+
+            <ComboBox fx:id="searchTypeCombo"
+                      promptText="Type"
+                      prefWidth="150"/>
+
+            <Button text="Réinitialiser"
+                    onAction="#resetFilters"/>
+        </HBox>
+
+
+        <TableView fx:id="operationTable"
+                   VBox.vgrow="ALWAYS"
+                   minHeight="300">
+
+            <columns>
+
+                <TableColumn fx:id="idColumn"
+                             text="ID"
+                             prefWidth="55"/>
+
+                <TableColumn fx:id="typeColumn"
+                             text="Type"
+                             prefWidth="100"/>
+
+                <TableColumn fx:id="montantColumn"
+                             text="Montant"
+                             prefWidth="140"/>
+
+                <TableColumn fx:id="dateColumn"
+                             text="Date"
+                             prefWidth="150"/>
+
+                <TableColumn fx:id="observationColumn"
+                             text="Observation"
+                             prefWidth="240"/>
+
+                <TableColumn fx:id="adherentColumn"
+                             text="Adhérent"
+                             prefWidth="200"/>
+
+            </columns>
+
+        </TableView>
+
+
+        <HBox alignment="CENTER_RIGHT"
+              spacing="10">
+
+            <Button fx:id="editButton"
+                    text="Modifier"
+                    onAction="#handleEdit"
+                    disable="true"
+                    style="-fx-padding: 8 18 8 18;"/>
+
+            <Button fx:id="deleteButton"
+                    text="Supprimer"
+                    onAction="#handleDelete"
+                    disable="true"
+                    style="-fx-background-color: #e74c3c;
+                           -fx-text-fill: white;
+                           -fx-padding: 8 18 8 18;"/>
+
+        </HBox>
+
+
+        <HBox alignment="CENTER"
+              spacing="15">
+
+            <Button fx:id="prevButton"
+                    text="‹ Précédent"
+                    onAction="#previousPage"/>
+
+            <Label text="Page"/>
+
+            <Label fx:id="pageLabel"
+                   text="1"
+                   style="-fx-font-weight: bold;"/>
+
+            <Label text="/"/>
+
+            <Label fx:id="totalPagesLabel"
+                   text="1"
+                   style="-fx-font-weight: bold;"/>
+
+            <Button fx:id="nextButton"
+                    text="Suivant ›"
+                    onAction="#nextPage"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label text="Afficher :"/>
+
+            <ComboBox fx:id="sizeCombo"
+                      prefWidth="80"/>
+
+            <Label text="Total :"/>
+
+            <Label fx:id="totalRecordsLabel"
+                   text="0"
+                   style="-fx-font-weight: bold;"/>
+
+        </HBox>
+
+    </VBox>
+
+
+    <!-- ============================================================ -->
+    <!-- FORMULAIRE (popup) -->
+    <!-- ============================================================ -->
+
+    <VBox fx:id="formPane"
+          visible="false"
+          managed="false"
+          spacing="16"
+          style="-fx-padding: 24; -fx-min-width: 600;">
+
+        <Label text="Gestion d'une opération"
+               style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <GridPane hgap="12"
+                  vgap="12">
+
+            <columnConstraints>
+
+                <ColumnConstraints minWidth="120"
+                                   prefWidth="120"/>
+
+                <ColumnConstraints minWidth="200"
+                                   prefWidth="200"
+                                   hgrow="ALWAYS"/>
+
+                <ColumnConstraints minWidth="120"
+                                   prefWidth="120"/>
+
+                <ColumnConstraints minWidth="200"
+                                   prefWidth="200"
+                                   hgrow="ALWAYS"/>
+
+            </columnConstraints>
+
+
+            <Label text="Type * :"
+                   GridPane.rowIndex="0"
+                   GridPane.columnIndex="0"/>
+
+            <ComboBox fx:id="typeCombo"
+                      maxWidth="Infinity"
+                      promptText="Sélectionner"
+                      GridPane.rowIndex="0"
+                      GridPane.columnIndex="1"/>
+
+
+            <Label text="Adhérent * :"
+                   GridPane.rowIndex="0"
+                   GridPane.columnIndex="2"/>
+
+            <ComboBox fx:id="adherentCombo"
+                      maxWidth="Infinity"
+                      promptText="Sélectionner un adhérent"
+                      GridPane.rowIndex="0"
+                      GridPane.columnIndex="3"/>
+
+
+            <Label text="Montant * :"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="0"/>
+
+            <TextField fx:id="montantField"
+                       promptText="Montant en FCFA"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="1"/>
+
+
+            <Label text="Solde actuel :"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="2"/>
+
+            <Label fx:id="soldeLabel"
+                   text="Solde actuel : —"
+                   style="-fx-font-weight: bold;"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="3"/>
+
+
+            <Label text="Observation :"
+                   GridPane.rowIndex="2"
+                   GridPane.columnIndex="0"/>
+
+            <TextArea fx:id="observationArea"
+                      promptText="Observation (optionnel)"
+                      prefRowCount="3"
+                      wrapText="true"
+                      GridPane.rowIndex="2"
+                      GridPane.columnIndex="1"
+                      GridPane.columnSpan="3"/>
+
+        </GridPane>
+
+
+        <Label fx:id="errorLabel"
+               style="-fx-text-fill: #e74c3c;
+                      -fx-font-size: 12;"/>
+
+
+        <HBox spacing="10"
+              alignment="CENTER_RIGHT">
+
+            <Button text="Annuler"
+                    onAction="#handleCancel"
+                    style="-fx-padding: 6 16 6 16;"/>
+
+            <Button text="Enregistrer"
+                    onAction="#handleSave"
+                    style="-fx-background-color: #27ae60;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-padding: 6 16 6 16;"/>
+
+        </HBox>
+
+    </VBox>
+
+</StackPane>

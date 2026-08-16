@@ -14,38 +14,243 @@ import java.util.List;
 
 public class OperationService {
 
-    private final OperationRepository operationRepository = new OperationRepository();
-    private final AdherentRepository adherentRepository = new AdherentRepository();
-    private final EpargneRepository epargneRepository = new EpargneRepository();
+    private final OperationRepository operationRepository =
+            new OperationRepository();
+
+    private final AdherentRepository adherentRepository =
+            new AdherentRepository();
+
+    private final EpargneRepository epargneRepository =
+            new EpargneRepository();
+
 
     public List<Operation> findAll() {
         return operationRepository.findAll();
     }
 
-    public List<Operation> findByAdherent(int adherentId) {
+
+    public List<Operation> findPaginated(
+            int page,
+            int size
+    ) {
+
+        return operationRepository.findPaginated(
+                page,
+                size
+        );
+    }
+
+
+    public List<Operation> findPaginatedSearch(
+            String keyword,
+            int page,
+            int size
+    ) {
+
+        if (keyword == null || keyword.isBlank()) {
+            return findPaginated(page, size);
+        }
+
+        return operationRepository.findPaginatedSearch(
+                keyword,
+                page,
+                size
+        );
+    }
+
+    public List<Operation> search(String keyword) {
+
+        if (keyword == null || keyword.isBlank()) {
+            return findAll();
+        }
+
+        return operationRepository.search(keyword);
+    }
+
+    public List<Operation> findByType(TypeOperation type) {
+        return operationRepository.findByType(type);
+    }
+
+
+    // =========================================================
+    // NOUVEAU : FILTRE PAR TYPE
+    // =========================================================
+
+    public List<Operation> findPaginatedByType(
+            TypeOperation type,
+            int page,
+            int size
+    ) {
+
+        return operationRepository.findPaginatedByType(
+                type,
+                page,
+                size
+        );
+    }
+
+
+    // =========================================================
+    // NOUVEAU : RECHERCHE + TYPE
+    // =========================================================
+
+    public List<Operation> findPaginatedSearch(
+            String keyword,
+            TypeOperation type,
+            int page,
+            int size
+    ) {
+
+        if (type == null) {
+
+            return findPaginatedSearch(
+                    keyword,
+                    page,
+                    size
+            );
+        }
+
+        if (keyword == null || keyword.isBlank()) {
+
+            return findPaginatedByType(
+                    type,
+                    page,
+                    size
+            );
+        }
+
+        return operationRepository.findPaginatedSearch(
+                keyword,
+                type,
+                page,
+                size
+        );
+    }
+
+
+    public long count() {
+        return operationRepository.count();
+    }
+
+
+    public long countSearch(
+            String keyword
+    ) {
+
+        if (keyword == null || keyword.isBlank()) {
+            return count();
+        }
+
+        return operationRepository.countSearch(
+                keyword
+        );
+    }
+
+
+    // =========================================================
+    // NOUVEAU : COMPTER PAR TYPE
+    // =========================================================
+
+    public long countByType(
+            TypeOperation type
+    ) {
+
+        if (type == null) {
+            return count();
+        }
+
+        return operationRepository.countByType(
+                type
+        );
+    }
+
+
+    // =========================================================
+    // NOUVEAU : COMPTER RECHERCHE + TYPE
+    // =========================================================
+
+    public long countSearch(
+            String keyword,
+            TypeOperation type
+    ) {
+
+        if (type == null) {
+            return countSearch(keyword);
+        }
+
+        if (keyword == null || keyword.isBlank()) {
+            return countByType(type);
+        }
+
+        return operationRepository.countSearch(
+                keyword,
+                type
+        );
+    }
+
+
+    public List<Operation> findByAdherent(
+            int adherentId
+    ) {
+
         adherentRepository.findById(adherentId)
-                .orElseThrow(() -> new RuntimeException("Adhérent introuvable."));
-        return operationRepository.findByAdherent(adherentId);
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Adhérent introuvable."
+                        )
+                );
+
+        return operationRepository.findByAdherent(
+                adherentId
+        );
     }
 
-    public Operation findById(int id) {
+
+    public Operation findById(
+            int id
+    ) {
+
         return operationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Opération introuvable."));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Opération introuvable."
+                        )
+                );
     }
 
-    public Operation create(Operation operation) {
+
+    public Operation create(
+            Operation operation
+    ) {
+
         validate(operation);
 
-        Adherent adherent = adherentRepository.findById(operation.getAdherent().getId())
-                .orElseThrow(() -> new RuntimeException("Adhérent introuvable."));
+        Adherent adherent =
+                adherentRepository
+                        .findById(
+                                operation
+                                        .getAdherent()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Adhérent introuvable."
+                                )
+                        );
 
         operation.setAdherent(adherent);
 
         if (operation.getDateOperation() == null) {
-            operation.setDateOperation(LocalDateTime.now());
+
+            operation.setDateOperation(
+                    LocalDateTime.now()
+            );
         }
 
-        Operation saved = operationRepository.save(operation);
+        Operation saved =
+                operationRepository.save(
+                        operation
+                );
 
         updateEpargne(operation);
 
@@ -53,114 +258,294 @@ public class OperationService {
     }
 
 
-    public Operation update(Operation operation) {
-        Operation oldOperation = operationRepository.findById(operation.getId())
-                .orElseThrow(() -> new RuntimeException("Opération introuvable."));
+    public Operation update(
+            Operation operation
+    ) {
+
+        Operation oldOperation =
+                operationRepository
+                        .findById(operation.getId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Opération introuvable."
+                                )
+                        );
 
         validate(operation);
 
-        Adherent adherent = adherentRepository.findById(operation.getAdherent().getId())
-                .orElseThrow(() -> new RuntimeException("Adhérent introuvable."));
+        Adherent adherent =
+                adherentRepository
+                        .findById(
+                                operation
+                                        .getAdherent()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Adhérent introuvable."
+                                )
+                        );
 
         operation.setAdherent(adherent);
 
-        operation.setCreatedAt(oldOperation.getCreatedAt());
-        operation.setCreatedBy(oldOperation.getCreatedBy());
+        operation.setCreatedAt(
+                oldOperation.getCreatedAt()
+        );
 
+        operation.setCreatedBy(
+                oldOperation.getCreatedBy()
+        );
 
-        boolean montantModifie = oldOperation.getMontant().compareTo(operation.getMontant()) != 0;
-        boolean typeModifie = oldOperation.getType() != operation.getType();
+        boolean montantModifie =
+                oldOperation
+                        .getMontant()
+                        .compareTo(
+                                operation.getMontant()
+                        ) != 0;
+
+        boolean typeModifie =
+                oldOperation.getType()
+                        != operation.getType();
 
         if (montantModifie || typeModifie) {
-            annulerOperationSurEpargne(oldOperation);
-            updateEpargne(operation);  // Appliquer la nouvelle opération 
+
+            annulerOperationSurEpargne(
+                    oldOperation
+            );
+
+            updateEpargne(
+                    operation
+            );
         }
 
-        return operationRepository.save(operation);
+        return operationRepository.save(
+                operation
+        );
     }
 
-    public Operation depot(int adherentId, BigDecimal montant, String observation) {
-        if (montant == null || montant.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Le montant du dépôt doit être supérieur à zéro.");
+
+    public Operation depot(
+            int adherentId,
+            BigDecimal montant,
+            String observation
+    ) {
+
+        if (montant == null ||
+                montant.compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new RuntimeException(
+                    "Le montant du dépôt doit être supérieur à zéro."
+            );
         }
 
-        Adherent adherent = adherentRepository.findById(adherentId)
-                .orElseThrow(() -> new RuntimeException("Adhérent introuvable."));
+        Adherent adherent =
+                adherentRepository
+                        .findById(adherentId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Adhérent introuvable."
+                                )
+                        );
 
-        Operation operation = Operation.builder()
-                .type(TypeOperation.DEPOT)
-                .montant(montant)
-                .dateOperation(LocalDateTime.now())
-                .observation(observation)
-                .adherent(adherent)
-                .build();
+        Operation operation =
+                Operation.builder()
+                        .type(TypeOperation.DEPOT)
+                        .montant(montant)
+                        .dateOperation(
+                                LocalDateTime.now()
+                        )
+                        .observation(observation)
+                        .adherent(adherent)
+                        .build();
 
         return create(operation);
     }
 
-    public Operation retrait(int adherentId, BigDecimal montant, String observation) {
-        if (montant == null || montant.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Le montant du retrait doit être supérieur à zéro.");
+
+    public Operation retrait(
+            int adherentId,
+            BigDecimal montant,
+            String observation
+    ) {
+
+        if (montant == null ||
+                montant.compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new RuntimeException(
+                    "Le montant du retrait doit être supérieur à zéro."
+            );
         }
 
-        Adherent adherent = adherentRepository.findById(adherentId)
-                .orElseThrow(() -> new RuntimeException("Adhérent introuvable."));
+        Adherent adherent =
+                adherentRepository
+                        .findById(adherentId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Adhérent introuvable."
+                                )
+                        );
 
-        Epargne epargne = epargneRepository.findByAdherent(adherentId)
-                .orElseThrow(() -> new RuntimeException("Aucune épargne trouvée pour cet adhérent."));
+        Epargne epargne =
+                epargneRepository
+                        .findByAdherent(adherentId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Aucune épargne trouvée pour cet adhérent."
+                                )
+                        );
 
-        if (epargne.getSolde().compareTo(montant) < 0) {
-            throw new RuntimeException("Solde d'épargne insuffisant.");
+        if (epargne.getSolde()
+                .compareTo(montant) < 0) {
+
+            throw new RuntimeException(
+                    "Solde d'épargne insuffisant."
+            );
         }
 
-        Operation operation = Operation.builder()
-                .type(TypeOperation.RETRAIT)
-                .montant(montant)
-                .dateOperation(LocalDateTime.now())
-                .observation(observation)
-                .adherent(adherent)
-                .build();
+        Operation operation =
+                Operation.builder()
+                        .type(TypeOperation.RETRAIT)
+                        .montant(montant)
+                        .dateOperation(
+                                LocalDateTime.now()
+                        )
+                        .observation(observation)
+                        .adherent(adherent)
+                        .build();
 
         return create(operation);
     }
 
-    private void updateEpargne(Operation operation) {
-        Epargne epargne = epargneRepository.findByAdherent(operation.getAdherent().getId())
-                .orElseThrow(() -> new RuntimeException("Aucune épargne trouvée pour cet adhérent."));
 
-        if (operation.getType() == TypeOperation.DEPOT) {
-            epargne.setSolde(epargne.getSolde().add(operation.getMontant()));
-        } else if (operation.getType() == TypeOperation.RETRAIT) {
-            epargne.setSolde(epargne.getSolde().subtract(operation.getMontant()));
+    private void updateEpargne(
+            Operation operation
+    ) {
+
+        Epargne epargne =
+                epargneRepository
+                        .findByAdherent(
+                                operation
+                                        .getAdherent()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Aucune épargne trouvée pour cet adhérent."
+                                )
+                        );
+
+        if (operation.getType()
+                == TypeOperation.DEPOT) {
+
+            epargne.setSolde(
+                    epargne.getSolde()
+                            .add(
+                                    operation.getMontant()
+                            )
+            );
+
+        } else if (operation.getType()
+                == TypeOperation.RETRAIT) {
+
+            epargne.setSolde(
+                    epargne.getSolde()
+                            .subtract(
+                                    operation.getMontant()
+                            )
+            );
         }
 
         epargneRepository.save(epargne);
     }
 
-    private void annulerOperationSurEpargne(Operation operation) {
-        Epargne epargne = epargneRepository.findByAdherent(operation.getAdherent().getId())
-                .orElseThrow(() -> new RuntimeException("Aucune épargne trouvée pour cet adhérent."));
 
-        if (operation.getType() == TypeOperation.DEPOT) {
-            epargne.setSolde(epargne.getSolde().subtract(operation.getMontant()));
-        } else if (operation.getType() == TypeOperation.RETRAIT) {
-            epargne.setSolde(epargne.getSolde().add(operation.getMontant()));
+    private void annulerOperationSurEpargne(
+            Operation operation
+    ) {
+
+        Epargne epargne =
+                epargneRepository
+                        .findByAdherent(
+                                operation
+                                        .getAdherent()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Aucune épargne trouvée pour cet adhérent."
+                                )
+                        );
+
+        if (operation.getType()
+                == TypeOperation.DEPOT) {
+
+            epargne.setSolde(
+                    epargne.getSolde()
+                            .subtract(
+                                    operation.getMontant()
+                            )
+            );
+
+        } else if (operation.getType()
+                == TypeOperation.RETRAIT) {
+
+            epargne.setSolde(
+                    epargne.getSolde()
+                            .add(
+                                    operation.getMontant()
+                            )
+            );
         }
 
         epargneRepository.save(epargne);
     }
 
-    public boolean delete(int id) {
-        Operation operation = operationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Opération introuvable."));
 
-        Epargne epargne = epargneRepository.findByAdherent(operation.getAdherent().getId())
-                .orElseThrow(() -> new RuntimeException("Aucune épargne trouvée."));
+    public boolean delete(
+            int id
+    ) {
 
-        if (operation.getType() == TypeOperation.DEPOT) {
-            epargne.setSolde(epargne.getSolde().subtract(operation.getMontant()));
-        } else if (operation.getType() == TypeOperation.RETRAIT) {
-            epargne.setSolde(epargne.getSolde().add(operation.getMontant()));
+        Operation operation =
+                operationRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Opération introuvable."
+                                )
+                        );
+
+        Epargne epargne =
+                epargneRepository
+                        .findByAdherent(
+                                operation
+                                        .getAdherent()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Aucune épargne trouvée."
+                                )
+                        );
+
+        if (operation.getType()
+                == TypeOperation.DEPOT) {
+
+            epargne.setSolde(
+                    epargne.getSolde()
+                            .subtract(
+                                    operation.getMontant()
+                            )
+            );
+
+        } else if (operation.getType()
+                == TypeOperation.RETRAIT) {
+
+            epargne.setSolde(
+                    epargne.getSolde()
+                            .add(
+                                    operation.getMontant()
+                            )
+            );
         }
 
         epargneRepository.save(epargne);
@@ -168,21 +553,50 @@ public class OperationService {
         return operationRepository.delete(id);
     }
 
-    public BigDecimal getSoldeAdherent(int adherentId) {
-        Epargne epargne = epargneRepository.findByAdherent(adherentId)
-                .orElseThrow(() -> new RuntimeException("Aucune épargne trouvée pour cet adhérent."));
+
+    public BigDecimal getSoldeAdherent(
+            int adherentId
+    ) {
+
+        Epargne epargne =
+                epargneRepository
+                        .findByAdherent(adherentId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Aucune épargne trouvée pour cet adhérent."
+                                )
+                        );
+
         return epargne.getSolde();
     }
 
-    private void validate(Operation operation) {
+
+    private void validate(
+            Operation operation
+    ) {
+
         if (operation.getType() == null) {
-            throw new RuntimeException("Le type d'opération est obligatoire.");
+
+            throw new RuntimeException(
+                    "Le type d'opération est obligatoire."
+            );
         }
-        if (operation.getMontant() == null || operation.getMontant().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Le montant doit être supérieur à zéro.");
+
+        if (operation.getMontant() == null ||
+                operation.getMontant()
+                        .compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new RuntimeException(
+                    "Le montant doit être supérieur à zéro."
+            );
         }
-        if (operation.getAdherent() == null || operation.getAdherent().getId() == 0) {
-            throw new RuntimeException("L'adhérent est obligatoire.");
+
+        if (operation.getAdherent() == null ||
+                operation.getAdherent().getId() == 0) {
+
+            throw new RuntimeException(
+                    "L'adhérent est obligatoire."
+            );
         }
     }
 }
