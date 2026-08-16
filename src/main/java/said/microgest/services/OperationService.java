@@ -501,58 +501,44 @@ public class OperationService {
     }
 
 
-    public boolean delete(
-            int id
-    ) {
+    public boolean delete(int id) {
 
         Operation operation =
                 operationRepository
                         .findById(id)
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Opération introuvable."
-                                )
+                                new RuntimeException("Opération introuvable.")
                         );
 
         Epargne epargne =
                 epargneRepository
-                        .findByAdherent(
-                                operation
-                                        .getAdherent()
-                                        .getId()
-                        )
+                        .findByAdherent(operation.getAdherent().getId())
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Aucune épargne trouvée."
-                                )
+                                new RuntimeException("Aucune épargne trouvée.")
                         );
 
-        if (operation.getType()
-                == TypeOperation.DEPOT) {
+        BigDecimal nouveauSolde;
 
-            epargne.setSolde(
-                    epargne.getSolde()
-                            .subtract(
-                                    operation.getMontant()
-                            )
-            );
+        if (operation.getType() == TypeOperation.DEPOT) {
+            nouveauSolde = epargne.getSolde().subtract(operation.getMontant());
+        } else {
+            nouveauSolde = epargne.getSolde().add(operation.getMontant());
+        }
 
-        } else if (operation.getType()
-                == TypeOperation.RETRAIT) {
-
-            epargne.setSolde(
-                    epargne.getSolde()
-                            .add(
-                                    operation.getMontant()
-                            )
+        // Enpêche un solde négatif après suppression
+        if (nouveauSolde.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException(
+                    "Impossible de supprimer cette opération : " +
+                            "le solde de l'adhérent deviendrait négatif. " +
+                            "Des retraits ont probablement été effectués depuis ce dépôt."
             );
         }
 
+        epargne.setSolde(nouveauSolde);
         epargneRepository.save(epargne);
 
         return operationRepository.delete(id);
     }
-
 
     public BigDecimal getSoldeAdherent(
             int adherentId
