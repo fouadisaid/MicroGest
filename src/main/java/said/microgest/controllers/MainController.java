@@ -51,6 +51,12 @@ public class MainController {
     private Button usersButton;
 
     @FXML
+    private Button epargnesButton;
+
+    @FXML
+    private Button remboursementsButton;
+
+    @FXML
     private Button parametrageButton;
 
     private User currentUser;
@@ -101,6 +107,10 @@ public class MainController {
         usersButton.setVisible(
                 currentRole.hasPermission(Permissions.MANAGE_USERS)
         );
+
+        remboursementsButton.setVisible(currentRole.hasPermission(Permissions.MANAGE_REMBOURSEMENTS));
+
+        epargnesButton.setVisible(currentRole.hasPermission(Permissions.VIEW_EPARGNE));
 
         parametrageButton.setVisible(
                 currentRole.hasPermission(Permissions.MANAGE_SETTINGS)
@@ -159,6 +169,16 @@ public class MainController {
                 Permissions.MANAGE_USERS,
                 "/views/user-form.fxml"
         );
+    }
+
+    @FXML
+    private void showEpargnes() {
+        verifierPermissionEtCharger(Permissions.VIEW_EPARGNE, "/views/epargne-form.fxml");
+    }
+
+    @FXML
+    private void showRemboursements() {
+        verifierPermissionEtCharger(Permissions.MANAGE_REMBOURSEMENTS, "/views/remboursement-form.fxml");
     }
 
     @FXML

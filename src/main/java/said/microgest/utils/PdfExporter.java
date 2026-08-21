@@ -1,4 +1,4 @@
 package said.microgest.utils;
 
-public class ExportPdfUtil {
+public class PdfExporter {
 }

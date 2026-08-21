@@ -27,7 +27,7 @@
                    style="-fx-text-fill: white; -fx-font-size: 13; -fx-font-weight: bold;"/>
 
             <Button fx:id="parametrageButton"
-                    text="Paramètres"
+                    text="⚙️ Paramètres"
                     onAction="#showParametrage"
                     style="-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 16 6 16;"/>
 
@@ -50,37 +50,49 @@
             <Separator/>
 
             <Button fx:id="dashboardButton"
-                    text="🏠  Tableau de bord"
+                    text="🏠 Tableau de bord"
                     onAction="#showDashboard"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
 
             <Button fx:id="adherentsButton"
-                    text="👤  Adhérents"
+                    text="👤 Adhérents"
                     onAction="#showAdherents"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
 
             <Button fx:id="operationsButton"
-                    text="💰  Opérations"
+                    text="💰 Opérations"
                     onAction="#showOperations"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
 
+            <Button fx:id="epargnesButton"
+                    text="🏦 Épargnes"
+                    onAction="#showEpargnes"
+                    maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
+
             <Button fx:id="pretsButton"
-                    text="💳  Prêts"
+                    text="💳 Prêts"
                     onAction="#showPrets"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
 
+            <Button fx:id="remboursementsButton"
+                    text="🔄 Remboursements"
+                    onAction="#showRemboursements"
+                    maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
+
             <Button fx:id="agencesButton"
-                    text="🏢  Agences"
+                    text="🏢 Agences"
                     onAction="#showAgences"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
 
             <Button fx:id="usersButton"
-                    text="👥  Utilisateurs"
+                    text="👥 Utilisateurs"
                     onAction="#showUsers"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10;"/>
