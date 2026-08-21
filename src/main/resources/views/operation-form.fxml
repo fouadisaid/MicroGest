@@ -65,6 +65,10 @@
                              text="Type"
                              prefWidth="100"/>
 
+                <TableColumn fx:id="adherentColumn"
+                             text="Adhérent"
+                             prefWidth="200"/>
+
                 <TableColumn fx:id="montantColumn"
                              text="Montant"
                              prefWidth="140"/>
@@ -76,10 +80,6 @@
                 <TableColumn fx:id="observationColumn"
                              text="Observation"
                              prefWidth="240"/>
-
-                <TableColumn fx:id="adherentColumn"
-                             text="Adhérent"
-                             prefWidth="200"/>
 
             </columns>
 

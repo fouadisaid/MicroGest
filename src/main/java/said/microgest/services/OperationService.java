@@ -72,9 +72,7 @@ public class OperationService {
     }
 
 
-    // =========================================================
-    // NOUVEAU : FILTRE PAR TYPE
-    // =========================================================
+
 
     public List<Operation> findPaginatedByType(
             TypeOperation type,
@@ -147,9 +145,7 @@ public class OperationService {
     }
 
 
-    // =========================================================
-    // NOUVEAU : COMPTER PAR TYPE
-    // =========================================================
+
 
     public long countByType(
             TypeOperation type
@@ -165,9 +161,7 @@ public class OperationService {
     }
 
 
-    // =========================================================
-    // NOUVEAU : COMPTER RECHERCHE + TYPE
-    // =========================================================
+
 
     public long countSearch(
             String keyword,
