@@ -17,6 +17,7 @@ public class PretRepository {
 
     public List<Pret> findAll() {
         try {
+            em.clear();
             return em.createQuery("""
                     SELECT p FROM Pret p
                     LEFT JOIN FETCH p.adherent
@@ -27,8 +28,55 @@ public class PretRepository {
         }
     }
 
+    public List<Pret> findPaginated(int page, int size) {
+        try {
+            em.clear();
+            return em.createQuery("""
+                    SELECT p FROM Pret p
+                    LEFT JOIN FETCH p.adherent
+                    ORDER BY p.datePret DESC
+                    """, Pret.class)
+                    .setFirstResult((page - 1) * size)
+                    .setMaxResults(size)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public long count() {
+        try {
+            em.clear();
+            return em.createQuery("SELECT COUNT(p) FROM Pret p", Long.class)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public List<Pret> search(String keyword) {
+        try {
+            em.clear();
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            return em.createQuery("""
+                    SELECT p FROM Pret p
+                    LEFT JOIN FETCH p.adherent a
+                    WHERE LOWER(a.nom) LIKE :q
+                       OR LOWER(a.prenom) LIKE :q
+                       OR LOWER(a.numeroAdherent) LIKE :q
+                    ORDER BY p.datePret DESC
+                    """, Pret.class)
+                    .setParameter("q", pattern)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
     public List<Pret> findByAdherent(int adherentId) {
         try {
+            em.clear();
             return em.createQuery(
                             "SELECT p FROM Pret p WHERE p.adherent.id = :adherentId ORDER BY p.datePret DESC",
                             Pret.class
@@ -41,8 +89,9 @@ public class PretRepository {
 
     public List<Pret> findByStatut(StatutPret statut) {
         try {
+            em.clear();
             return em.createQuery(
-                            "SELECT p FROM Pret p WHERE p.statut = :statut ORDER BY p.datePret DESC",
+                            "SELECT p FROM Pret p LEFT JOIN FETCH p.adherent WHERE p.statut = :statut ORDER BY p.datePret DESC",
                             Pret.class
                     ).setParameter("statut", statut)
                     .getResultList();
@@ -102,6 +151,7 @@ public class PretRepository {
 
     public long countByStatut(StatutPret statut) {
         try {
+            em.clear();
             return em.createQuery(
                             "SELECT COUNT(p) FROM Pret p WHERE p.statut = :statut",
                             Long.class
@@ -114,6 +164,7 @@ public class PretRepository {
 
     public BigDecimal sumMontantTotal() {
         try {
+            em.clear();
             BigDecimal sum = em.createQuery(
                     "SELECT SUM(p.montant) FROM Pret p",
                     BigDecimal.class
@@ -123,6 +174,4 @@ public class PretRepository {
             return BigDecimal.ZERO;
         }
     }
-
-
 }

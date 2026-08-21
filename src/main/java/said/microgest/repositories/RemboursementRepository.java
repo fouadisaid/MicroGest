@@ -15,9 +15,11 @@ public class RemboursementRepository {
 
     public List<Remboursement> findAll() {
         try {
+            em.clear();
             return em.createQuery("""
                     SELECT r FROM Remboursement r
-                    LEFT JOIN FETCH r.pret
+                    LEFT JOIN FETCH r.pret p
+                    LEFT JOIN FETCH p.adherent
                     ORDER BY r.datePaiement DESC
                     """, Remboursement.class).getResultList();
         } catch (Exception e) {
@@ -27,10 +29,59 @@ public class RemboursementRepository {
 
     public List<Remboursement> findByPret(int pretId) {
         try {
+            em.clear();
             return em.createQuery(
-                            "SELECT r FROM Remboursement r WHERE r.pret.id = :pretId ORDER BY r.datePaiement ASC",
+                            "SELECT r FROM Remboursement r WHERE r.pret.id = :pretId ORDER BY r.numeroEcheance ASC",
                             Remboursement.class
                     ).setParameter("pretId", pretId)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Remboursement> findPaginated(int page, int size) {
+        try {
+            em.clear();
+            return em.createQuery("""
+                    SELECT r FROM Remboursement r
+                    LEFT JOIN FETCH r.pret p
+                    LEFT JOIN FETCH p.adherent
+                    ORDER BY r.datePaiement DESC
+                    """, Remboursement.class)
+                    .setFirstResult((page - 1) * size)
+                    .setMaxResults(size)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public long count() {
+        try {
+            em.clear();
+            return em.createQuery("SELECT COUNT(r) FROM Remboursement r", Long.class)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public List<Remboursement> search(String keyword) {
+        try {
+            em.clear();
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            return em.createQuery("""
+                    SELECT r FROM Remboursement r
+                    LEFT JOIN FETCH r.pret p
+                    LEFT JOIN FETCH p.adherent a
+                    WHERE LOWER(a.nom) LIKE :q
+                       OR LOWER(a.prenom) LIKE :q
+                       OR LOWER(a.numeroAdherent) LIKE :q
+                    ORDER BY r.datePaiement DESC
+                    """, Remboursement.class)
+                    .setParameter("q", pattern)
                     .getResultList();
         } catch (Exception e) {
             return new ArrayList<>();
