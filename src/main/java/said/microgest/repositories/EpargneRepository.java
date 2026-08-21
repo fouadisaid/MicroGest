@@ -7,6 +7,7 @@ import said.microgest.config.HibernateUtil;
 import said.microgest.entities.Epargne;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,24 +16,80 @@ public class EpargneRepository {
     private final EntityManager em = HibernateUtil.getEntityManager();
 
     public List<Epargne> findAll() {
-        return em.createQuery("""
-                SELECT e FROM Epargne e
-                LEFT JOIN FETCH e.adherent
-                ORDER BY e.id
-                """, Epargne.class).getResultList();
+        try {
+            em.clear();
+            return em.createQuery("""
+                    SELECT e FROM Epargne e
+                    LEFT JOIN FETCH e.adherent
+                    ORDER BY e.id
+                    """, Epargne.class).getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Epargne> findPaginated(int page, int size) {
+        try {
+            em.clear();
+            return em.createQuery("""
+                    SELECT e FROM Epargne e
+                    LEFT JOIN FETCH e.adherent
+                    ORDER BY e.id
+                    """, Epargne.class)
+                    .setFirstResult((page - 1) * size)
+                    .setMaxResults(size)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public long count() {
+        try {
+            em.clear();
+            return em.createQuery("SELECT COUNT(e) FROM Epargne e", Long.class)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public List<Epargne> search(String keyword) {
+        try {
+            em.clear();
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            return em.createQuery("""
+                    SELECT e FROM Epargne e
+                    LEFT JOIN FETCH e.adherent a
+                    WHERE LOWER(a.nom) LIKE :q
+                       OR LOWER(a.prenom) LIKE :q
+                       OR LOWER(a.numeroAdherent) LIKE :q
+                    ORDER BY e.id
+                    """, Epargne.class)
+                    .setParameter("q", pattern)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public Optional<Epargne> findById(int id) {
-        return Optional.ofNullable(em.find(Epargne.class, id));
+        try {
+            return Optional.ofNullable(em.find(Epargne.class, id));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public Optional<Epargne> findByAdherent(int adherentId) {
 
         try {
-
+            em.clear();
             return Optional.of(
                     em.createQuery("""
                         SELECT e FROM Epargne e
+                        LEFT JOIN FETCH e.adherent
                         WHERE e.adherent.id = :id
                         """, Epargne.class)
                             .setParameter("id", adherentId)
@@ -105,6 +162,7 @@ public class EpargneRepository {
 
     public BigDecimal getTotalEpargne() {
         try {
+            em.clear();
             BigDecimal sum = em.createQuery(
                     "SELECT SUM(e.solde) FROM Epargne e",
                     BigDecimal.class

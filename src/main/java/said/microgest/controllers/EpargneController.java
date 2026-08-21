@@ -1,327 +1,454 @@
 package said.microgest.controllers;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import said.microgest.entities.Adherent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
 import said.microgest.entities.Epargne;
-import said.microgest.services.AdherentService;
+import said.microgest.entities.Operation;
 import said.microgest.services.EpargneService;
 import said.microgest.utils.AlertUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class EpargneController {
 
-    @FXML
-    private TableView<Epargne> epargneTable;
+    @FXML private StackPane rootPane;
+    @FXML private VBox listPane;
+    @FXML private VBox detailPane;
 
-    @FXML
-    private TableColumn<Epargne, Integer> idColumn;
+    @FXML private TableView<Epargne> epargneTable;
 
-    @FXML
-    private TableColumn<Epargne, BigDecimal> soldeColumn;
+    @FXML private TableColumn<Epargne, Number> idColumn;
+    @FXML private TableColumn<Epargne, String> adherentColumn;
+    @FXML private TableColumn<Epargne, String> numeroColumn;
+    @FXML private TableColumn<Epargne, String> soldeColumn;
+    @FXML private TableColumn<Epargne, String> dateColumn;
 
-    @FXML
-    private TableColumn<Epargne, LocalDate> dateOuvertureColumn;
+    @FXML private TextField searchField;
+    @FXML private Label totalLabel;
 
-    @FXML
-    private TableColumn<Epargne, String> adherentColumn;
+    @FXML private ComboBox<Integer> sizeCombo;
+    @FXML private Button prevButton;
+    @FXML private Button nextButton;
+    @FXML private Label pageLabel;
+    @FXML private Label totalPagesLabel;
+    @FXML private Label totalRecordsLabel;
 
-    @FXML
-    private ComboBox<Adherent> adherentCombo;
+    @FXML private Button detailButton;
 
-    @FXML
-    private TextField soldeField;
+    @FXML private Label detailAdherentLabel;
+    @FXML private Label detailNumeroLabel;
+    @FXML private Label detailDateLabel;
+    @FXML private Label detailSoldeLabel;
 
-    @FXML
-    private DatePicker dateOuverturePicker;
-
-    @FXML
-    private Label totalEpargneLabel;
-
-    @FXML
-    private Label interetsLabel;
-
-    @FXML
-    private Button saveButton;
-
-    @FXML
-    private Button cancelButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button calculerInteretsButton;
-
-    @FXML
-    private Button ajouterInteretsButton;
+    @FXML private TableView<Operation> operationTable;
+    @FXML private TableColumn<Operation, String> opTypeColumn;
+    @FXML private TableColumn<Operation, String> opMontantColumn;
+    @FXML private TableColumn<Operation, String> opDateColumn;
+    @FXML private TableColumn<Operation, String> opObservationColumn;
 
     private final EpargneService epargneService = new EpargneService();
-    private final AdherentService adherentService = new AdherentService();
-    private ObservableList<Epargne> epargnes = FXCollections.observableArrayList();
+
+    private final DateTimeFormatter dateFormatter =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    private final DateTimeFormatter dateTimeFormatter =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private long totalRecords = 0;
+    private int totalPages = 1;
 
     @FXML
     public void initialize() {
-        initTableColumns();
-        loadAdherents();
-        loadData();
-        setupSelectionListener();
-        chargerTotalEpargne();
-        setupAdherentListener();
+
+        if (epargneTable != null) {
+
+            configurerColonnesEpargne();
+
+            sizeCombo.setItems(
+                    FXCollections.observableArrayList(5, 10, 20, 50)
+            );
+
+            sizeCombo.setValue(pageSize);
+
+            sizeCombo.setOnAction(event -> {
+
+                Integer valeur = sizeCombo.getValue();
+
+                if (valeur != null) {
+
+                    pageSize = valeur;
+                    currentPage = 1;
+
+                    chargerDonnees();
+                }
+            });
+
+            epargneTable.getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener(
+                            (obs, oldSelection, newSelection) ->
+                                    detailButton.setDisable(newSelection == null)
+                    );
+
+            searchField.textProperty()
+                    .addListener(
+                            (obs, oldValue, newValue) -> {
+
+                                currentPage = 1;
+                                chargerDonnees();
+                            }
+                    );
+
+            chargerDonnees();
+            chargerTotal();
+        }
+
+        if (operationTable != null) {
+
+            configurerColonnesOperations();
+        }
+
+        if (listPane != null && detailPane != null) {
+
+            listPane.setVisible(true);
+            listPane.setManaged(true);
+
+            detailPane.setVisible(false);
+            detailPane.setManaged(false);
+        }
     }
 
-    private void initTableColumns() {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        soldeColumn.setCellValueFactory(new PropertyValueFactory<>("solde"));
-        soldeColumn.setCellFactory(col -> new TableCell<Epargne, BigDecimal>() {
-            @Override
-            protected void updateItem(BigDecimal item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(String.format("%,.0f FCFA", item));
-                }
-            }
-        });
-        dateOuvertureColumn.setCellValueFactory(new PropertyValueFactory<>("dateOuverture"));
+    private void configurerColonnesEpargne() {
 
-        adherentColumn.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().getAdherent() != null ?
-                                cellData.getValue().getAdherent().getFullName() : ""
+        idColumn.setCellValueFactory(
+                data -> new SimpleIntegerProperty(data.getValue().getId())
+        );
+
+        adherentColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        data.getValue().getAdherent() != null
+                                ? data.getValue().getAdherent().getFullName()
+                                : ""
+                )
+        );
+
+        numeroColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        data.getValue().getAdherent() != null
+                                ? data.getValue().getAdherent().getNumeroAdherent()
+                                : ""
+                )
+        );
+
+        soldeColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        String.format("%,.0f FCFA", data.getValue().getSolde())
+                )
+        );
+
+        dateColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        data.getValue().getDateOuverture() != null
+                                ? data.getValue().getDateOuverture().format(dateFormatter)
+                                : ""
                 )
         );
     }
 
-    private void loadAdherents() {
-        try {
-            List<Adherent> adherents = adherentService.findAll();
-            adherentCombo.setItems(FXCollections.observableArrayList(adherents));
+    private void configurerColonnesOperations() {
 
-            // Ajout d'un convertisseur pour afficher le nom complet dans le ComboBox
-            adherentCombo.setCellFactory(listView -> new ListCell<Adherent>() {
-                @Override
-                protected void updateItem(Adherent item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item.getFullName());
-                    }
-                }
-            });
+        opTypeColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        data.getValue().getType() != null
+                                ? data.getValue().getType().name()
+                                : ""
+                )
+        );
 
-            adherentCombo.setButtonCell(new ListCell<Adherent>() {
-                @Override
-                protected void updateItem(Adherent item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item.getFullName());
-                    }
-                }
-            });
+        opTypeColumn.setCellFactory(column ->
+                new TableCell<>() {
 
-        } catch (Exception e) {
-            AlertUtil.error("Erreur", "Erreur lors du chargement des adhérents : " + e.getMessage());
-        }
-    }
+                    @Override
+                    protected void updateItem(String type, boolean empty) {
 
-    private void setupAdherentListener() {
-        adherentCombo.valueProperty().addListener((obs, old, selected) -> {
-            if (selected != null) {
-                try {
-                    // Vérifier si l'adhérent a déjà une épargne
-                    epargneService.findByAdherent(selected.getId());
-                    AlertUtil.warning("Attention", "Cet adhérent a déjà une épargne.");
-                    adherentCombo.setValue(null);
-                } catch (RuntimeException e) {
-                    // L'adhérent n'a pas d'épargne, c'est bon
-                }
-            }
-        });
-    }
+                        super.updateItem(type, empty);
 
-    private void setupSelectionListener() {
-        epargneTable.getSelectionModel().selectedItemProperty().addListener(
-                (obs, old, selected) -> {
-                    if (selected != null) {
-                        afficherEpargne(selected);
+                        if (empty || type == null) {
+
+                            setText(null);
+                            setStyle("");
+
+                            return;
+                        }
+
+                        if (type.equals("DEPOT")) {
+
+                            setText("DÉPÔT");
+
+                            setStyle(
+                                    "-fx-text-fill: #27ae60; -fx-font-weight: bold;"
+                            );
+
+                        } else {
+
+                            setText("RETRAIT");
+
+                            setStyle(
+                                    "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
+                            );
+                        }
                     }
                 }
         );
+
+        opMontantColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        String.format("%,.0f FCFA", data.getValue().getMontant())
+                )
+        );
+
+        opDateColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        data.getValue().getDateOperation() != null
+                                ? data.getValue().getDateOperation().format(dateTimeFormatter)
+                                : ""
+                )
+        );
+
+        opObservationColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(
+                        data.getValue().getObservation() != null
+                                ? data.getValue().getObservation()
+                                : ""
+                )
+        );
     }
 
-    private void loadData() {
+    private void chargerDonnees() {
+
         try {
-            epargnes.setAll(epargneService.findAll());
-            epargneTable.setItems(epargnes);
+
+            String keyword = searchField.getText();
+
+            if (keyword != null && !keyword.isBlank()) {
+
+                List<Epargne> result = epargneService.search(keyword.trim());
+
+                epargneTable.setItems(FXCollections.observableArrayList(result));
+
+                totalRecords = result.size();
+                totalPages = 1;
+                currentPage = 1;
+
+                mettreAJourPagination();
+
+                return;
+            }
+
+            List<Epargne> epargnes = epargneService.findPaginated(currentPage, pageSize);
+
+            epargneTable.setItems(FXCollections.observableArrayList(epargnes));
+
+            totalRecords = epargneService.count();
+
+            totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+            if (totalPages < 1) {
+                totalPages = 1;
+            }
+
+            if (currentPage > totalPages) {
+
+                currentPage = totalPages;
+
+                epargnes = epargneService.findPaginated(currentPage, pageSize);
+
+                epargneTable.setItems(FXCollections.observableArrayList(epargnes));
+            }
+
+            mettreAJourPagination();
+
         } catch (Exception e) {
-            AlertUtil.error("Erreur", "Erreur lors du chargement des épargnes : " + e.getMessage());
+
+            e.printStackTrace();
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible de charger les épargnes : " + e.getMessage()
+            );
         }
     }
 
-    private void chargerTotalEpargne() {
-        try {
-            BigDecimal total = epargneService.getTotalEpargne();
-            totalEpargneLabel.setText("Total épargne : " + String.format("%,.0f FCFA", total));
-        } catch (Exception e) {
-            totalEpargneLabel.setText("Total épargne : -");
-        }
-    }
+    private void chargerTotal() {
 
-    private void afficherEpargne(Epargne epargne) {
-        adherentCombo.setValue(epargne.getAdherent());
-        soldeField.setText(epargne.getSolde().toString());
-        dateOuverturePicker.setValue(epargne.getDateOuverture());
-
-        // Calculer les intérêts
         try {
-            BigDecimal interets = epargneService.calculerInterets(epargne);
-            interetsLabel.setText("Intérêts estimés : " + String.format("%,.2f FCFA", interets));
+
+            totalLabel.setText(
+                    "Total épargné : "
+                            + String.format("%,.0f FCFA", epargneService.getTotalEpargne())
+            );
+
         } catch (Exception e) {
-            interetsLabel.setText("Intérêts estimés : -");
+
+            totalLabel.setText("Total épargné : —");
         }
     }
 
     @FXML
-    private void handleSave() {
-        try {
-            Epargne epargne = new Epargne();
+    private void resetFilters() {
 
-            if (epargneTable.getSelectionModel().getSelectedItem() != null) {
-                epargne.setId(epargneTable.getSelectionModel().getSelectedItem().getId());
-            }
+        searchField.clear();
 
-            epargne.setAdherent(adherentCombo.getValue());
-            epargne.setSolde(new BigDecimal(soldeField.getText().trim()));
-            epargne.setDateOuverture(dateOuverturePicker.getValue());
+        currentPage = 1;
 
-            if (epargne.getId() == 0) {
-                epargneService.create(epargne);
-                AlertUtil.information("Succès", "Épargne créée avec succès !");
-            } else {
-                epargneService.update(epargne);
-                AlertUtil.information("Succès", "Épargne modifiée avec succès !");
-            }
+        chargerDonnees();
+    }
 
-            clearForm();
-            loadData();
-            chargerTotalEpargne();
+    @FXML
+    private void previousPage() {
 
-        } catch (NumberFormatException e) {
-            AlertUtil.error("Erreur", "Veuillez saisir un montant valide.");
-        } catch (RuntimeException e) {
-            AlertUtil.error("Erreur", e.getMessage());
+        if (currentPage > 1) {
+
+            currentPage--;
+            chargerDonnees();
         }
     }
 
     @FXML
-    private void handleDelete() {
-        Epargne selected = epargneTable.getSelectionModel().getSelectedItem();
+    private void nextPage() {
 
-        if (selected == null) {
-            AlertUtil.warning("Avertissement", "Veuillez sélectionner une épargne.");
+        if (currentPage < totalPages) {
+
+            currentPage++;
+            chargerDonnees();
+        }
+    }
+
+    private void mettreAJourPagination() {
+
+        pageLabel.setText(String.valueOf(currentPage));
+        totalPagesLabel.setText(String.valueOf(totalPages));
+        totalRecordsLabel.setText(String.valueOf(totalRecords));
+
+        prevButton.setDisable(currentPage <= 1);
+        nextButton.setDisable(currentPage >= totalPages);
+    }
+
+    @FXML
+    private void handleDetail() {
+
+        Epargne epargne = epargneTable.getSelectionModel().getSelectedItem();
+
+        if (epargne == null) {
+
+            AlertUtil.warning("Attention", "Veuillez sélectionner un compte épargne.");
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("Supprimer l'épargne");
-        alert.setContentText("Voulez-vous vraiment supprimer cette épargne ?");
+        try {
 
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    epargneService.delete(selected.getId());
-                    AlertUtil.information("Succès", "Épargne supprimée avec succès !");
-                    clearForm();
-                    loadData();
-                    chargerTotalEpargne();
-                } catch (RuntimeException e) {
-                    AlertUtil.error("Erreur", e.getMessage());
-                }
-            }
-        });
-    }
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/epargne-view.fxml")
+            );
 
-    @FXML
-    private void handleCalculerInterets() {
-        Epargne selected = epargneTable.getSelectionModel().getSelectedItem();
+            Parent root = loader.load();
 
-        if (selected == null) {
-            // Calculer à partir du formulaire
-            if (adherentCombo.getValue() != null) {
-                try {
-                    Epargne epargne = new Epargne();
-                    epargne.setAdherent(adherentCombo.getValue());
-                    epargne.setSolde(new BigDecimal(soldeField.getText().trim()));
-                    epargne.setDateOuverture(dateOuverturePicker.getValue());
+            EpargneController controller = loader.getController();
 
-                    BigDecimal interets = epargneService.calculerInterets(epargne);
-                    interetsLabel.setText("Intérêts estimés : " + String.format("%,.2f FCFA", interets));
-                } catch (Exception e) {
-                    AlertUtil.error("Erreur", "Erreur lors du calcul : " + e.getMessage());
-                }
-            } else {
-                AlertUtil.warning("Avertissement", "Veuillez sélectionner un adhérent.");
-            }
-        } else {
-            try {
-                BigDecimal interets = epargneService.calculerInterets(selected);
-                AlertUtil.information("Intérêts", "Intérêts estimés : " + String.format("%,.2f FCFA", interets));
-            } catch (Exception e) {
-                AlertUtil.error("Erreur", e.getMessage());
-            }
+            controller.setEpargneDetail(epargne);
+
+            Stage stage = new Stage();
+
+            stage.setTitle("Détail du compte épargne");
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.setScene(new Scene(root));
+
+            stage.showAndWait();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible d'ouvrir le détail :\n\n" + e.getMessage()
+            );
         }
     }
 
-    @FXML
-    private void handleAjouterInterets() {
-        Epargne selected = epargneTable.getSelectionModel().getSelectedItem();
+    public void setEpargneDetail(Epargne epargne) {
 
-        if (selected == null) {
-            AlertUtil.warning("Avertissement", "Veuillez sélectionner une épargne.");
+        if (listPane == null || detailPane == null) {
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("Ajouter les intérêts");
-        alert.setContentText("Voulez-vous ajouter les intérêts à cette épargne ?");
+        listPane.setVisible(false);
+        listPane.setManaged(false);
 
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    BigDecimal interets = epargneService.ajouterInterets(selected.getAdherent().getId());
-                    AlertUtil.information("Succès", "Intérêts ajoutés : " + String.format("%,.2f FCFA", interets));
-                    loadData();
-                    chargerTotalEpargne();
-                } catch (Exception e) {
-                    AlertUtil.error("Erreur", e.getMessage());
-                }
-            }
-        });
+        detailPane.setVisible(true);
+        detailPane.setManaged(true);
+
+        detailAdherentLabel.setText(
+                epargne.getAdherent() != null
+                        ? epargne.getAdherent().getFullName()
+                        : "—"
+        );
+
+        detailNumeroLabel.setText(
+                epargne.getAdherent() != null
+                        ? epargne.getAdherent().getNumeroAdherent()
+                        : "—"
+        );
+
+        detailDateLabel.setText(
+                epargne.getDateOuverture() != null
+                        ? epargne.getDateOuverture().format(dateFormatter)
+                        : "—"
+        );
+
+        detailSoldeLabel.setText(
+                String.format("%,.0f FCFA", epargne.getSolde())
+        );
+
+        try {
+
+            List<Operation> historique =
+                    epargneService.getHistoriqueOperations(epargne.getAdherent().getId());
+
+            operationTable.setItems(FXCollections.observableArrayList(historique));
+
+        } catch (Exception e) {
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible de charger l'historique : " + e.getMessage()
+            );
+        }
     }
 
     @FXML
-    private void handleCancel() {
-        clearForm();
-    }
+    private void handleCloseDetail() {
 
-    private void clearForm() {
-        adherentCombo.setValue(null);
-        soldeField.clear();
-        dateOuverturePicker.setValue(null);
-        interetsLabel.setText("Intérêts estimés : -");
-        epargneTable.getSelectionModel().clearSelection();
+        if (detailAdherentLabel != null && detailAdherentLabel.getScene() != null) {
+
+            Stage stage = (Stage) detailAdherentLabel.getScene().getWindow();
+            stage.close();
+        }
     }
 }
