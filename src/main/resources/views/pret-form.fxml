@@ -1,73 +1,309 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="10" xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="said.microgest.controllers.PretController"
-      stylesheets="/css/application.css">
+<StackPane fx:id="rootPane"
+           xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="said.microgest.controllers.PretController"
+           style="-fx-background-color: #ecf0f1;">
 
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
+    <!-- ============================================================ -->
+    <!-- LISTE -->
+    <!-- ============================================================ -->
 
-    <Label text="🏦 Gestion des Prêts" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <VBox fx:id="listPane"
+          spacing="15"
+          style="-fx-padding: 24;">
 
-    <!-- Barre d'outils -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button text="✅ Valider" onAction="#handleValider" styleClass="btn-success"/>
-        <Button text="❌ Rejeter" onAction="#handleRejeter" styleClass="btn-danger"/>
-        <Button text="📊 Calculer mensualité" onAction="#handleCalculerMensualite" styleClass="btn-primary"/>
-    </HBox>
+        <HBox alignment="CENTER_LEFT"
+              spacing="10">
 
-    <TableView fx:id="pretTable" VBox.vgrow="ALWAYS" prefHeight="250">
-        <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="40"/>
-            <TableColumn fx:id="montantColumn" text="Montant" prefWidth="150"/>
-            <TableColumn fx:id="tauxColumn" text="Taux %" prefWidth="100"/>
-            <TableColumn fx:id="dureeColumn" text="Durée (mois)" prefWidth="100"/>
-            <TableColumn fx:id="dateColumn" text="Date" prefWidth="120"/>
-            <TableColumn fx:id="statutColumn" text="Statut" prefWidth="120"/>
-            <TableColumn fx:id="adherentColumn" text="Adhérent" prefWidth="200"/>
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-        </columnResizePolicy>
-    </TableView>
+            <Label text="Gestion des prêts"
+                   style="-fx-font-size: 22; -fx-font-weight: bold;"/>
 
-    <TitledPane text="Formulaire Prêt" expanded="false">
-        <GridPane hgap="10" vgap="10">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
+            <Region HBox.hgrow="ALWAYS"/>
 
-            <Label text="Montant :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <TextField fx:id="montantField" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200"/>
+            <Button fx:id="addButton"
+                    text="+ Ajouter un prêt"
+                    onAction="#handleAdd"
+                    style="-fx-background-color: #27ae60;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-padding: 8 18 8 18;"/>
+        </HBox>
 
-            <Label text="Taux (%) :" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-            <TextField fx:id="tauxField" GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="200"/>
 
-            <Label text="Durée (mois) :" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <TextField fx:id="dureeField" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200"/>
+        <HBox spacing="10">
 
-            <Label text="Date prêt :" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-            <DatePicker fx:id="datePretPicker" GridPane.columnIndex="3" GridPane.rowIndex="1" prefWidth="200"/>
+            <TextField fx:id="searchField"
+                       promptText="Rechercher par adhérent..."
+                       HBox.hgrow="ALWAYS"/>
 
-            <Label text="Statut :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="statutCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="200"/>
+            <ComboBox fx:id="statutFilter"
+                      promptText="Statut"
+                      prefWidth="160"/>
 
-            <Label text="Adhérent :" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="adherentCombo" GridPane.columnIndex="3" GridPane.rowIndex="2" prefWidth="200"/>
+            <Button text="Réinitialiser"
+                    onAction="#resetFilters"/>
+        </HBox>
 
-            <Label fx:id="mensualiteLabel" text="Mensualité : -" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="4" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
 
-            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="4">
-                <Button fx:id="saveButton" text="💾 Enregistrer" onAction="#handleSave" styleClass="btn-success"/>
-                <Button fx:id="cancelButton" text="❌ Annuler" onAction="#handleCancel" styleClass="btn-secondary"/>
-                <Button fx:id="deleteButton" text="🗑️ Supprimer" onAction="#handleDelete" styleClass="btn-danger"/>
-            </HBox>
+        <TableView fx:id="pretTable"
+                   VBox.vgrow="ALWAYS"
+                   minHeight="300">
+
+            <columns>
+
+                <TableColumn fx:id="idColumn"
+                             text="ID"
+                             prefWidth="55"/>
+
+                <TableColumn fx:id="adherentColumn"
+                             text="Adhérent"
+                             prefWidth="180"/>
+
+                <TableColumn fx:id="montantColumn"
+                             text="Montant preté"
+                             prefWidth="130"/>
+
+                <TableColumn fx:id="montantRestantColumn"
+                             text=" Restant dû"
+                             prefWidth="130"/>
+
+                <TableColumn fx:id="tauxColumn"
+                             text="Taux"
+                             prefWidth="70"/>
+
+                <TableColumn fx:id="dureeColumn"
+                             text="Durée (mois)"
+                             prefWidth="100"/>
+
+                <TableColumn fx:id="dateColumn"
+                             text="Date"
+                             prefWidth="100"/>
+
+                <TableColumn fx:id="statutColumn"
+                             text="Statut"
+                             prefWidth="110"/>
+
+            </columns>
+
+        </TableView>
+
+
+        <HBox alignment="CENTER_RIGHT"
+              spacing="10">
+
+            <Button fx:id="rembourserButton"
+                    text="Rembourser"
+                    onAction="#handleRembourser"
+                    disable="true"
+                    style="-fx-background-color: #2980b9;
+                           -fx-text-fill: white;
+                           -fx-padding: 8 18 8 18;"/>
+
+            <Button fx:id="validerButton"
+                    text="Valider"
+                    onAction="#handleValider"
+                    disable="true"
+                    style="-fx-background-color: #27ae60;
+                           -fx-text-fill: white;
+                           -fx-padding: 8 18 8 18;"/>
+
+            <Button fx:id="rejeterButton"
+                    text="Rejeter"
+                    onAction="#handleRejeter"
+                    disable="true"
+                    style="-fx-background-color: #e67e22;
+                           -fx-text-fill: white;
+                           -fx-padding: 8 18 8 18;"/>
+
+            <Button fx:id="editButton"
+                    text="Modifier"
+                    onAction="#handleEdit"
+                    disable="true"
+                    style="-fx-padding: 8 18 8 18;"/>
+
+            <Button fx:id="deleteButton"
+                    text="Supprimer"
+                    onAction="#handleDelete"
+                    disable="true"
+                    style="-fx-background-color: #e74c3c;
+                           -fx-text-fill: white;
+                           -fx-padding: 8 18 8 18;"/>
+
+        </HBox>
+
+
+        <HBox alignment="CENTER"
+              spacing="15">
+
+            <Button fx:id="prevButton"
+                    text="‹ Précédent"
+                    onAction="#previousPage"/>
+
+            <Label text="Page"/>
+
+            <Label fx:id="pageLabel"
+                   text="1"
+                   style="-fx-font-weight: bold;"/>
+
+            <Label text="/"/>
+
+            <Label fx:id="totalPagesLabel"
+                   text="1"
+                   style="-fx-font-weight: bold;"/>
+
+            <Button fx:id="nextButton"
+                    text="Suivant ›"
+                    onAction="#nextPage"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label text="Afficher :"/>
+
+            <ComboBox fx:id="sizeCombo"
+                      prefWidth="80"/>
+
+            <Label text="Total :"/>
+
+            <Label fx:id="totalRecordsLabel"
+                   text="0"
+                   style="-fx-font-weight: bold;"/>
+
+        </HBox>
+
+    </VBox>
+
+
+    <!-- ============================================================ -->
+    <!-- FORMULAIRE (popup) -->
+    <!-- ============================================================ -->
+
+    <VBox fx:id="formPane"
+          visible="false"
+          managed="false"
+          spacing="16"
+          style="-fx-padding: 24; -fx-min-width: 600;">
+
+        <Label text="Gestion d'un prêt"
+               style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+        <GridPane hgap="12"
+                  vgap="12">
+
+            <columnConstraints>
+
+                <ColumnConstraints minWidth="120"
+                                   prefWidth="120"/>
+
+                <ColumnConstraints minWidth="200"
+                                   prefWidth="200"
+                                   hgrow="ALWAYS"/>
+
+                <ColumnConstraints minWidth="120"
+                                   prefWidth="120"/>
+
+                <ColumnConstraints minWidth="200"
+                                   prefWidth="200"
+                                   hgrow="ALWAYS"/>
+
+            </columnConstraints>
+
+
+            <Label text="Adhérent * :"
+                   GridPane.rowIndex="0"
+                   GridPane.columnIndex="0"/>
+
+            <ComboBox fx:id="adherentCombo"
+                      maxWidth="Infinity"
+                      promptText="Sélectionner un adhérent"
+                      GridPane.rowIndex="0"
+                      GridPane.columnIndex="1"
+                      GridPane.columnSpan="3"/>
+
+
+            <Label text="Montant * :"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="0"/>
+
+            <TextField fx:id="montantField"
+                       promptText="Montant en FCFA"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="1"/>
+
+
+            <Label text="Taux (%) * :"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="2"/>
+
+            <TextField fx:id="tauxField"
+                       promptText="Ex : 5.5"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="3"/>
+
+
+            <Label text="Durée (mois) * :"
+                   GridPane.rowIndex="2"
+                   GridPane.columnIndex="0"/>
+
+            <TextField fx:id="dureeField"
+                       promptText="Ex : 12"
+                       GridPane.rowIndex="2"
+                       GridPane.columnIndex="1"/>
+
+
+            <Label text="Date du prêt :"
+                   GridPane.rowIndex="2"
+                   GridPane.columnIndex="2"/>
+
+            <DatePicker fx:id="datePretPicker"
+                        maxWidth="Infinity"
+                        promptText="jj/mm/aaaa"
+                        GridPane.rowIndex="2"
+                        GridPane.columnIndex="3"/>
+
+
+            <Button fx:id="calculerMensualiteButton"
+                    text="Calculer la mensualité"
+                    onAction="#handleCalculerMensualite"
+                    GridPane.rowIndex="3"
+                    GridPane.columnIndex="0"
+                    GridPane.columnSpan="2"/>
+
+            <Label fx:id="mensualiteLabel"
+                   text="Mensualité : —"
+                   style="-fx-font-weight: bold;"
+                   GridPane.rowIndex="3"
+                   GridPane.columnIndex="2"
+                   GridPane.columnSpan="2"/>
+
         </GridPane>
-    </TitledPane>
-</VBox>
+
+
+        <Label fx:id="errorLabel"
+               style="-fx-text-fill: #e74c3c;
+                      -fx-font-size: 12;"/>
+
+
+        <HBox spacing="10"
+              alignment="CENTER_RIGHT">
+
+            <Button text="Annuler"
+                    onAction="#handleCancel"
+                    style="-fx-padding: 6 16 6 16;"/>
+
+            <Button text="Enregistrer"
+                    onAction="#handleSave"
+                    style="-fx-background-color: #27ae60;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-padding: 6 16 6 16;"/>
+
+        </HBox>
+
+    </VBox>
+
+</StackPane>
