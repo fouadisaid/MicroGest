@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -7,335 +8,546 @@
            xmlns="http://javafx.com/javafx/17"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="said.microgest.controllers.AdherentController"
-           style="-fx-background-color: #ecf0f1;">
+           style="-fx-background-color: #f4f7fb;">
+
+    <!-- ====================================================== -->
+    <!-- LISTE DES ADHERENTS -->
+    <!-- ====================================================== -->
 
     <VBox fx:id="listPane"
-          spacing="15"
-          style="-fx-padding: 24;">
+          spacing="18"
+          style="-fx-padding: 28;">
+
+        <!-- EN-TÊTE -->
 
         <HBox alignment="CENTER_LEFT"
-              spacing="10">
+              spacing="15">
 
-            <Label text="Gestion des adhérents"
-                   style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+            <VBox spacing="3">
+
+                <Label text="Gestion des adhérents"
+                       style="-fx-font-size: 26px;
+                              -fx-font-weight: bold;
+                              -fx-text-fill: #1f2937;"/>
+
+                <Label text="Gérez les adhérents et leurs informations"
+                       style="-fx-font-size: 13px;
+                              -fx-text-fill: #6b7280;"/>
+
+            </VBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <Button fx:id="addButton"
-                    text="+ Ajouter un adhérent"
+                    text="+  Ajouter un adhérent"
                     onAction="#handleAdd"
-                    style="-fx-background-color: #27ae60;
+                    style="-fx-background-color: #16a34a;
+                           -fx-background-radius: 8;
                            -fx-text-fill: white;
+                           -fx-font-size: 13px;
                            -fx-font-weight: bold;
-                           -fx-padding: 8 18 8 18;"/>
+                           -fx-padding: 11 20 11 20;
+                           -fx-cursor: hand;"/>
+
         </HBox>
 
 
-        <HBox spacing="10">
+        <!-- ================================================== -->
+        <!-- BARRE DE RECHERCHE -->
+        <!-- ================================================== -->
+
+        <HBox spacing="12"
+              alignment="CENTER_LEFT"
+              style="-fx-background-color: white;
+                     -fx-background-radius: 10;
+                     -fx-border-color: #e5e7eb;
+                     -fx-border-radius: 10;
+                     -fx-padding: 14;">
+
+            <Label text="🔎"
+                   style="-fx-font-size: 17px;"/>
 
             <TextField fx:id="searchField"
-                       promptText="Rechercher un adhérent..."
-                       HBox.hgrow="ALWAYS"/>
+                       promptText="Rechercher par nom, prénom, téléphone..."
+                       HBox.hgrow="ALWAYS"
+                       style="-fx-background-color: #f8fafc;
+                              -fx-background-radius: 7;
+                              -fx-border-color: #e5e7eb;
+                              -fx-border-radius: 7;
+                              -fx-padding: 9 12;
+                              -fx-font-size: 13px;"/>
 
             <ComboBox fx:id="statutFilter"
-                      promptText="Statut"
-                      prefWidth="150"/>
+                      promptText="Tous les statuts"
+                      prefWidth="155"
+                      style="-fx-background-radius: 7;"/>
 
             <ComboBox fx:id="agenceFilter"
-                      promptText="Agence"
-                      prefWidth="180"/>
+                      promptText="Toutes les agences"
+                      prefWidth="180"
+                      style="-fx-background-radius: 7;"/>
 
             <Button text="Réinitialiser"
-                    onAction="#resetFilters"/>
+                    onAction="#resetFilters"
+                    style="-fx-background-color: #f1f5f9;
+                           -fx-text-fill: #475569;
+                           -fx-background-radius: 7;
+                           -fx-padding: 9 15 9 15;
+                           -fx-cursor: hand;"/>
+
         </HBox>
 
 
-        <TableView fx:id="adherentTable"
-                   VBox.vgrow="ALWAYS"
-                   minHeight="300">
+        <!-- ================================================== -->
+        <!-- TABLEAU -->
+        <!-- ================================================== -->
 
-            <columns>
+        <VBox VBox.vgrow="ALWAYS"
+              spacing="0"
+              style="-fx-background-color: white;
+                     -fx-background-radius: 12;
+                     -fx-border-color: #e5e7eb;
+                     -fx-border-radius: 12;">
 
-                <TableColumn fx:id="idColumn"
-                             text="ID"
-                             prefWidth="55"/>
+            <HBox alignment="CENTER_LEFT"
+                  style="-fx-padding: 15 18 12 18;">
 
-                <TableColumn fx:id="numeroColumn"
-                             text="N° Adhérent"
-                             prefWidth="125"/>
+                <Label text="Liste des adhérents"
+                       style="-fx-font-size: 16px;
+                              -fx-font-weight: bold;
+                              -fx-text-fill: #1f2937;"/>
 
-                <TableColumn fx:id="nomColumn"
-                             text="Nom"
-                             prefWidth="120"/>
+                <Region HBox.hgrow="ALWAYS"/>
 
-                <TableColumn fx:id="prenomColumn"
-                             text="Prénom"
-                             prefWidth="120"/>
+                <Label text="Sélectionnez une ligne pour effectuer une action"
+                       style="-fx-font-size: 12px;
+                              -fx-text-fill: #94a3b8;"/>
 
-                <TableColumn fx:id="sexeColumn"
-                             text="Sexe"
-                             prefWidth="70"/>
+            </HBox>
 
-                <TableColumn fx:id="telephoneColumn"
-                             text="Téléphone"
-                             prefWidth="130"/>
+            <Separator/>
 
-                <TableColumn fx:id="emailColumn"
-                             text="Email"
-                             prefWidth="190"/>
+            <TableView fx:id="adherentTable"
+                       VBox.vgrow="ALWAYS"
+                       minHeight="300"
+                       style="-fx-background-color: transparent;
+                              -fx-border-width: 0;">
 
-                <TableColumn fx:id="adresseColumn"
-                             text="Adresse"
-                             prefWidth="180"/>
+                <columns>
 
-                <TableColumn fx:id="statutColumn"
-                             text="Statut"
-                             prefWidth="110"/>
+                    <TableColumn fx:id="idColumn"
+                                 text="ID"
+                                 prefWidth="55"/>
 
-                <TableColumn fx:id="agenceColumn"
-                             text="Agence"
-                             prefWidth="160"/>
+                    <TableColumn fx:id="numeroColumn"
+                                 text="N° Adhérent"
+                                 prefWidth="125"/>
 
-            </columns>
+                    <TableColumn fx:id="nomColumn"
+                                 text="Nom"
+                                 prefWidth="120"/>
 
-        </TableView>
+                    <TableColumn fx:id="prenomColumn"
+                                 text="Prénom"
+                                 prefWidth="120"/>
 
+                    <TableColumn fx:id="sexeColumn"
+                                 text="Sexe"
+                                 prefWidth="70"/>
+
+                    <TableColumn fx:id="telephoneColumn"
+                                 text="Téléphone"
+                                 prefWidth="130"/>
+
+                    <TableColumn fx:id="emailColumn"
+                                 text="Email"
+                                 prefWidth="190"/>
+
+                    <TableColumn fx:id="adresseColumn"
+                                 text="Adresse"
+                                 prefWidth="180"/>
+
+                    <TableColumn fx:id="statutColumn"
+                                 text="Statut"
+                                 prefWidth="110"/>
+
+                    <TableColumn fx:id="agenceColumn"
+                                 text="Agence"
+                                 prefWidth="160"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+
+        <!-- ================================================== -->
+        <!-- ACTIONS -->
+        <!-- ================================================== -->
 
         <HBox alignment="CENTER_RIGHT"
               spacing="10">
 
             <Button fx:id="editButton"
-                    text="Modifier"
+                    text="✏  Modifier"
                     onAction="#handleEdit"
                     disable="true"
-                    style="-fx-padding: 8 18 8 18;"/>
+                    style="-fx-background-color: #e0f2fe;
+                           -fx-text-fill: #0369a1;
+                           -fx-background-radius: 7;
+                           -fx-padding: 9 17 9 17;
+                           -fx-font-weight: bold;
+                           -fx-cursor: hand;"/>
 
             <Button fx:id="deleteButton"
-                    text="Supprimer"
+                    text="🗑  Supprimer"
                     onAction="#handleDelete"
                     disable="true"
-                    style="-fx-background-color: #e74c3c;
-                           -fx-text-fill: white;
-                           -fx-padding: 8 18 8 18;"/>
+                    style="-fx-background-color: #fee2e2;
+                           -fx-text-fill: #dc2626;
+                           -fx-background-radius: 7;
+                           -fx-padding: 9 17 9 17;
+                           -fx-font-weight: bold;
+                           -fx-cursor: hand;"/>
 
             <Button fx:id="toggleStatutButton"
-                    text="Changer statut"
+                    text="↔  Changer statut"
                     onAction="#handleToggleStatut"
                     disable="true"
-                    style="-fx-padding: 8 18 8 18;"/>
+                    style="-fx-background-color: #fef3c7;
+                           -fx-text-fill: #92400e;
+                           -fx-background-radius: 7;
+                           -fx-padding: 9 17 9 17;
+                           -fx-font-weight: bold;
+                           -fx-cursor: hand;"/>
 
         </HBox>
 
 
+        <!-- ================================================== -->
+        <!-- PAGINATION -->
+        <!-- ================================================== -->
+
         <HBox alignment="CENTER"
-              spacing="15">
+              spacing="12"
+              style="-fx-background-color: white;
+                     -fx-background-radius: 10;
+                     -fx-border-color: #e5e7eb;
+                     -fx-border-radius: 10;
+                     -fx-padding: 11 15 11 15;">
 
             <Button fx:id="prevButton"
-                    text="‹ Précédent"
-                    onAction="#previousPage"/>
+                    text="‹  Précédent"
+                    onAction="#previousPage"
+                    style="-fx-background-color: #f8fafc;
+                           -fx-text-fill: #475569;
+                           -fx-background-radius: 6;
+                           -fx-padding: 7 13 7 13;
+                           -fx-cursor: hand;"/>
 
-            <Label text="Page"/>
+            <Label text="Page"
+                   style="-fx-text-fill: #64748b;"/>
 
             <Label fx:id="pageLabel"
                    text="1"
-                   style="-fx-font-weight: bold;"/>
+                   style="-fx-font-weight: bold;
+                          -fx-text-fill: #2563eb;"/>
 
-            <Label text="/"/>
+            <Label text="/"
+                   style="-fx-text-fill: #94a3b8;"/>
 
             <Label fx:id="totalPagesLabel"
                    text="1"
-                   style="-fx-font-weight: bold;"/>
+                   style="-fx-font-weight: bold;
+                          -fx-text-fill: #475569;"/>
 
             <Button fx:id="nextButton"
-                    text="Suivant ›"
-                    onAction="#nextPage"/>
+                    text="Suivant  ›"
+                    onAction="#nextPage"
+                    style="-fx-background-color: #f8fafc;
+                           -fx-text-fill: #475569;
+                           -fx-background-radius: 6;
+                           -fx-padding: 7 13 7 13;
+                           -fx-cursor: hand;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <Label text="Afficher :"/>
+            <Label text="Afficher :"
+                   style="-fx-text-fill: #64748b;"/>
 
             <ComboBox fx:id="sizeCombo"
-                      prefWidth="80"/>
+                      prefWidth="80"
+                      style="-fx-background-radius: 6;"/>
 
-            <Label text="Total :"/>
+            <Label text="Total :"
+                   style="-fx-text-fill: #64748b;"/>
 
             <Label fx:id="totalRecordsLabel"
                    text="0"
-                   style="-fx-font-weight: bold;"/>
+                   style="-fx-font-weight: bold;
+                          -fx-text-fill: #1f2937;"/>
 
         </HBox>
 
     </VBox>
 
 
+    <!-- ====================================================== -->
+    <!-- FORMULAIRE ADHERENT -->
+    <!-- ====================================================== -->
+
     <VBox fx:id="formPane"
           visible="false"
           managed="false"
-          spacing="16"
-          style="-fx-padding: 24; -fx-min-width: 600;">
+          spacing="20"
+          style="-fx-padding: 28;
+                 -fx-background-color: white;
+                 -fx-background-radius: 14;
+                 -fx-border-color: #e5e7eb;
+                 -fx-border-radius: 14;
+                 -fx-min-width: 700;
+                 -fx-max-width: 900;">
 
-        <Label text="Gestion d'un adhérent"
-               style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+        <!-- TITRE -->
 
-        <GridPane hgap="12"
-                  vgap="12">
+        <VBox spacing="4">
+
+            <Label text="Gestion d'un adhérent"
+                   style="-fx-font-size: 23px;
+                          -fx-font-weight: bold;
+                          -fx-text-fill: #1f2937;"/>
+
+            <Label text="Renseignez les informations de l'adhérent"
+                   style="-fx-font-size: 13px;
+                          -fx-text-fill: #6b7280;"/>
+
+        </VBox>
+
+
+        <Separator/>
+
+
+        <!-- FORMULAIRE -->
+
+        <GridPane hgap="15"
+                  vgap="15">
 
             <columnConstraints>
 
                 <ColumnConstraints minWidth="120"
                                    prefWidth="120"/>
 
-                <ColumnConstraints minWidth="200"
-                                   prefWidth="200"
+                <ColumnConstraints minWidth="220"
+                                   prefWidth="220"
                                    hgrow="ALWAYS"/>
 
                 <ColumnConstraints minWidth="120"
                                    prefWidth="120"/>
 
-                <ColumnConstraints minWidth="200"
-                                   prefWidth="200"
+                <ColumnConstraints minWidth="220"
+                                   prefWidth="220"
                                    hgrow="ALWAYS"/>
 
             </columnConstraints>
 
 
+            <!-- N° ADHERENT -->
+
             <Label text="N° Adhérent :"
                    GridPane.rowIndex="0"
-                   GridPane.columnIndex="0"/>
+                   GridPane.columnIndex="0"
+                   style="-fx-text-fill: #475569;"/>
 
             <TextField fx:id="numeroField"
                        promptText="Auto-généré"
                        editable="false"
                        GridPane.rowIndex="0"
-                       GridPane.columnIndex="1"/>
+                       GridPane.columnIndex="1"
+                       style="-fx-background-color: #f1f5f9;
+                              -fx-background-radius: 7;"/>
 
+
+            <!-- NOM -->
 
             <Label text="Nom * :"
                    GridPane.rowIndex="0"
-                   GridPane.columnIndex="2"/>
+                   GridPane.columnIndex="2"
+                   style="-fx-text-fill: #475569;"/>
 
             <TextField fx:id="nomField"
                        promptText="Nom"
                        GridPane.rowIndex="0"
-                       GridPane.columnIndex="3"/>
+                       GridPane.columnIndex="3"
+                       style="-fx-background-radius: 7;"/>
 
+
+            <!-- PRENOM -->
 
             <Label text="Prénom * :"
                    GridPane.rowIndex="1"
-                   GridPane.columnIndex="0"/>
+                   GridPane.columnIndex="0"
+                   style="-fx-text-fill: #475569;"/>
 
             <TextField fx:id="prenomField"
                        promptText="Prénom"
                        GridPane.rowIndex="1"
-                       GridPane.columnIndex="1"/>
+                       GridPane.columnIndex="1"
+                       style="-fx-background-radius: 7;"/>
 
+
+            <!-- SEXE -->
 
             <Label text="Sexe * :"
                    GridPane.rowIndex="1"
-                   GridPane.columnIndex="2"/>
+                   GridPane.columnIndex="2"
+                   style="-fx-text-fill: #475569;"/>
 
             <ComboBox fx:id="sexeCombo"
                       maxWidth="Infinity"
                       promptText="Sélectionner"
                       GridPane.rowIndex="1"
-                      GridPane.columnIndex="3"/>
+                      GridPane.columnIndex="3"
+                      style="-fx-background-radius: 7;"/>
 
+
+            <!-- DATE NAISSANCE -->
 
             <Label text="Date naissance :"
                    GridPane.rowIndex="2"
-                   GridPane.columnIndex="0"/>
+                   GridPane.columnIndex="0"
+                   style="-fx-text-fill: #475569;"/>
 
             <DatePicker fx:id="dateNaissancePicker"
                         maxWidth="Infinity"
                         promptText="jj/mm/aaaa"
                         GridPane.rowIndex="2"
-                        GridPane.columnIndex="1"/>
+                        GridPane.columnIndex="1"
+                        style="-fx-background-radius: 7;"/>
 
+
+            <!-- TELEPHONE -->
 
             <Label text="Téléphone * :"
                    GridPane.rowIndex="2"
-                   GridPane.columnIndex="2"/>
+                   GridPane.columnIndex="2"
+                   style="-fx-text-fill: #475569;"/>
 
             <TextField fx:id="telephoneField"
                        promptText="+221 77 123 45 67"
                        GridPane.rowIndex="2"
-                       GridPane.columnIndex="3"/>
+                       GridPane.columnIndex="3"
+                       style="-fx-background-radius: 7;"/>
 
+
+            <!-- EMAIL -->
 
             <Label text="Email :"
                    GridPane.rowIndex="3"
-                   GridPane.columnIndex="0"/>
+                   GridPane.columnIndex="0"
+                   style="-fx-text-fill: #475569;"/>
 
             <TextField fx:id="emailField"
                        promptText="email@domaine.com"
                        GridPane.rowIndex="3"
-                       GridPane.columnIndex="1"/>
+                       GridPane.columnIndex="1"
+                       style="-fx-background-radius: 7;"/>
 
+
+            <!-- ADRESSE -->
 
             <Label text="Adresse :"
                    GridPane.rowIndex="3"
-                   GridPane.columnIndex="2"/>
+                   GridPane.columnIndex="2"
+                   style="-fx-text-fill: #475569;"/>
 
             <TextField fx:id="adresseField"
                        promptText="Adresse"
                        GridPane.rowIndex="3"
-                       GridPane.columnIndex="3"/>
+                       GridPane.columnIndex="3"
+                       style="-fx-background-radius: 7;"/>
 
+
+            <!-- DATE ADHESION -->
 
             <Label text="Date adhésion :"
                    GridPane.rowIndex="4"
-                   GridPane.columnIndex="0"/>
+                   GridPane.columnIndex="0"
+                   style="-fx-text-fill: #475569;"/>
 
             <DatePicker fx:id="dateAdhesionPicker"
                         maxWidth="Infinity"
                         promptText="jj/mm/aaaa"
                         GridPane.rowIndex="4"
-                        GridPane.columnIndex="1"/>
+                        GridPane.columnIndex="1"
+                        style="-fx-background-radius: 7;"/>
 
+
+            <!-- STATUT -->
 
             <Label text="Statut :"
                    GridPane.rowIndex="4"
-                   GridPane.columnIndex="2"/>
+                   GridPane.columnIndex="2"
+                   style="-fx-text-fill: #475569;"/>
 
             <ComboBox fx:id="statutCombo"
                       maxWidth="Infinity"
                       promptText="Sélectionner"
                       GridPane.rowIndex="4"
-                      GridPane.columnIndex="3"/>
+                      GridPane.columnIndex="3"
+                      style="-fx-background-radius: 7;"/>
 
+
+            <!-- AGENCE -->
 
             <Label text="Agence * :"
                    GridPane.rowIndex="5"
-                   GridPane.columnIndex="0"/>
+                   GridPane.columnIndex="0"
+                   style="-fx-text-fill: #475569;"/>
 
             <ComboBox fx:id="agenceCombo"
                       maxWidth="Infinity"
                       promptText="Sélectionner une agence"
                       GridPane.rowIndex="5"
                       GridPane.columnIndex="1"
-                      GridPane.columnSpan="3"/>
+                      GridPane.columnSpan="3"
+                      style="-fx-background-radius: 7;"/>
 
         </GridPane>
 
 
-        <Label fx:id="errorLabel"
-               style="-fx-text-fill: #e74c3c;
-                      -fx-font-size: 12;"/>
+        <!-- MESSAGE ERREUR -->
 
+        <Label fx:id="errorLabel"
+               wrapText="true"
+               style="-fx-text-fill: #dc2626;
+                      -fx-font-size: 12px;"/>
+
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+
+        <!-- ACTIONS -->
 
         <HBox spacing="10"
               alignment="CENTER_RIGHT">
 
             <Button text="Annuler"
                     onAction="#handleCancel"
-                    style="-fx-padding: 6 16 6 16;"/>
+                    style="-fx-background-color: #f1f5f9;
+                           -fx-text-fill: #475569;
+                           -fx-background-radius: 7;
+                           -fx-padding: 9 18 9 18;
+                           -fx-cursor: hand;"/>
 
-            <Button text="Enregistrer"
+            <Button text="✓  Enregistrer"
                     onAction="#handleSave"
-                    style="-fx-background-color: #27ae60;
+                    style="-fx-background-color: #16a34a;
                            -fx-text-fill: white;
                            -fx-font-weight: bold;
-                           -fx-padding: 6 16 6 16;"/>
+                           -fx-background-radius: 7;
+                           -fx-padding: 9 20 9 20;
+                           -fx-cursor: hand;"/>
 
         </HBox>
 

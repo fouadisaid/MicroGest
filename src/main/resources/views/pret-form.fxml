@@ -134,6 +134,13 @@
                            -fx-text-fill: white;
                            -fx-padding: 8 18 8 18;"/>
 
+            <Button fx:id="rappelsButton"
+                    text="Rappels échéances"
+                    onAction="#handleVerifierEcheances"
+                    style="-fx-background-color: #8e44ad;
+               -fx-text-fill: white;
+               -fx-padding: 8 18 8 18;"/>
+
         </HBox>
 
 

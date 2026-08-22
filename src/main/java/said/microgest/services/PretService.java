@@ -7,6 +7,7 @@ import said.microgest.enums.StatutPret;
 import said.microgest.repositories.AdherentRepository;
 import said.microgest.repositories.PretRepository;
 import said.microgest.repositories.RemboursementRepository;
+import said.microgest.utils.EmailUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -157,7 +158,16 @@ public class PretService {
         }
 
         pret.setStatut(StatutPret.VALIDE);
-        return pretRepository.save(pret);
+
+        Pret saved = pretRepository.save(pret);
+
+        try {
+            EmailUtil.envoyerPretAccorde(saved);
+        } catch (Exception ignored) {
+            // L'échec d'envoi d'email ne doit jamais empêcher la validation du prêt
+        }
+
+        return saved;
     }
 
     public Pret rejeter(int pretId) {
@@ -398,5 +408,41 @@ public class PretService {
         pretRepository.save(pret);
 
         return remboursement;
+    }
+
+    public List<Pret> verifierEcheancesProches(int joursAvant) {
+
+        List<Pret> pretsNotifies = new java.util.ArrayList<>();
+        LocalDate aujourdHui = LocalDate.now();
+
+        for (Pret pret : findValides()) {
+
+            if (pret.getDatePret() == null) {
+                continue;
+            }
+
+            LocalDate dateEcheance = pret.getDatePret().plusMonths(pret.getDuree());
+
+            long joursRestants =
+                    java.time.temporal.ChronoUnit.DAYS.between(aujourdHui, dateEcheance);
+
+            if (joursRestants >= 0 && joursRestants <= joursAvant) {
+
+                Adherent adherent = pret.getAdherent();
+
+                if (adherent != null &&
+                        adherent.getEmail() != null &&
+                        !adherent.getEmail().isBlank()) {
+
+                    BigDecimal restant = getMontantRestant(pret.getId());
+
+                    EmailUtil.envoyerEcheanceProche(pret, restant, dateEcheance);
+
+                    pretsNotifies.add(pret);
+                }
+            }
+        }
+
+        return pretsNotifies;
     }
 }

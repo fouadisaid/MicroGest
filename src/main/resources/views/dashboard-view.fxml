@@ -5,60 +5,180 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="15" xmlns="http://javafx.com/javafx/17"
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="said.microgest.controllers.DashboardController"
-      stylesheets="/css/application.css">
+      stylesheets="/css/application.css"
+      style="-fx-background-color: #f4f6f8; -fx-padding: 15;">
 
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
+    <!-- ===================================================== -->
+    <!-- EN-TÊTE -->
+    <!-- ===================================================== -->
 
-    <Label text="📊 Tableau de Bord" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <VBox spacing="2">
+            <Label text="📊 Tableau de bord"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Vue générale de l'activité"
+                   style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
 
-    <!-- Indicateurs clés -->
-    <GridPane hgap="15" vgap="10">
-        <padding>
-            <Insets top="10" bottom="10"/>
-        </padding>
+    <!-- ===================================================== -->
+    <!-- PREMIÈRE LIGNE : INDICATEURS PRINCIPAUX -->
+    <!-- ===================================================== -->
 
-        <Label text="👥 Total adhérents :" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
-        <Label fx:id="totalAdherentsLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-size: 16px;"/>
+    <GridPane hgap="12" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+        </columnConstraints>
 
-        <Label text="💰 Total épargne :" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
-        <Label fx:id="totalEpargneLabel" GridPane.columnIndex="3" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-text-fill: #27ae60;"/>
+        <!-- ADHÉRENTS -->
+        <VBox spacing="3"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="0"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="👥" style="-fx-font-size: 18px;"/>
+            <Label text="Adhérents" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="totalAdherentsLabel" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+        </VBox>
 
-        <Label text="🏦 Total prêts validés :" GridPane.columnIndex="4" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
-        <Label fx:id="totalPretsLabel" GridPane.columnIndex="5" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-text-fill: #2980b9;"/>
+        <!-- ÉPARGNE -->
+        <VBox spacing="3"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="0"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="💰" style="-fx-font-size: 18px;"/>
+            <Label text="Épargne" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="totalEpargneLabel" text="0 FCFA" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+        </VBox>
 
-        <Label text="📈 Opérations du mois :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-        <Label fx:id="operationsMoisLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-size: 16px;"/>
+        <!-- PRÊTS -->
+        <VBox spacing="3"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="0"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="🏦" style="-fx-font-size: 18px;"/>
+            <Label text="Prêts" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="totalPretsLabel" text="0 FCFA" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+        </VBox>
 
-        <Label text="📥 Dépôts du mois :" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-        <Label fx:id="depotsMoisLabel" GridPane.columnIndex="3" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-text-fill: #27ae60;"/>
-
-        <Label text="📤 Retraits du mois :" GridPane.columnIndex="4" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-        <Label fx:id="retraitsMoisLabel" GridPane.columnIndex="5" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-text-fill: #e74c3c;"/>
-
-        <Separator GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="6"/>
-
-        <Label text="⏳ Prêts en attente :" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
-        <Label fx:id="pretsEnAttenteLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-text-fill: #f39c12;"/>
-
-        <Label text="✅ Prêts validés :" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
-        <Label fx:id="pretsValidesLabel" GridPane.columnIndex="3" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-text-fill: #27ae60;"/>
-
-        <Label text="🔁 Prêts remboursés :" GridPane.columnIndex="4" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
-        <Label fx:id="pretsRemboursesLabel" GridPane.columnIndex="5" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-text-fill: #2980b9;"/>
-
-        <Label text="❌ Prêts rejetés :" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
-        <Label fx:id="pretsRejetesLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-font-size: 16px; -fx-text-fill: #e74c3c;"/>
+        <!-- OPÉRATIONS -->
+        <VBox spacing="3"
+              GridPane.columnIndex="3"
+              GridPane.rowIndex="0"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="📊" style="-fx-font-size: 18px;"/>
+            <Label text="Opérations" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="operationsMoisLabel" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8e44ad;"/>
+        </VBox>
     </GridPane>
 
-    <!-- Graphiques -->
-    <HBox spacing="20" alignment="CENTER" VBox.vgrow="ALWAYS">
-        <PieChart fx:id="statutPieChart" prefWidth="350" prefHeight="350"/>
-        <PieChart fx:id="agencePieChart" prefWidth="350" prefHeight="350"/>
+    <!-- ===================================================== -->
+    <!-- DEUXIÈME LIGNE : DÉPÔTS / RETRAITS -->
+    <!-- ===================================================== -->
+
+    <GridPane hgap="12" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <!-- DÉPÔTS -->
+        <HBox spacing="12" alignment="CENTER_LEFT"
+              GridPane.columnIndex="0" GridPane.rowIndex="0"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="📥" style="-fx-font-size: 20px;"/>
+            <VBox spacing="2">
+                <Label text="Dépôts ce mois" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+                <Label fx:id="depotsMoisLabel" text="0 FCFA" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+            </VBox>
+        </HBox>
+
+        <!-- RETRAITS -->
+        <HBox spacing="12" alignment="CENTER_LEFT"
+              GridPane.columnIndex="1" GridPane.rowIndex="0"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="📤" style="-fx-font-size: 20px;"/>
+            <VBox spacing="2">
+                <Label text="Retraits ce mois" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+                <Label fx:id="retraitsMoisLabel" text="0 FCFA" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+            </VBox>
+        </HBox>
+    </GridPane>
+
+    <!-- ===================================================== -->
+    <!-- STATISTIQUES DES PRÊTS -->
+    <!-- ===================================================== -->
+
+    <VBox spacing="8"
+          style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+
+        <Label text="État des prêts" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <GridPane hgap="10" vgap="8">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <!-- EN ATTENTE -->
+            <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                  style="-fx-background-color: #fff8e7; -fx-background-radius: 8; -fx-padding: 10;">
+                <Label text="⏳ En attente" style="-fx-text-fill: #f39c12; -fx-font-size: 11px;"/>
+                <Label fx:id="pretsEnAttenteLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"/>
+            </VBox>
+
+            <!-- VALIDÉS -->
+            <VBox spacing="2" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                  style="-fx-background-color: #eafaf1; -fx-background-radius: 8; -fx-padding: 10;">
+                <Label text="✅ Validés" style="-fx-text-fill: #27ae60; -fx-font-size: 11px;"/>
+                <Label fx:id="pretsValidesLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+            </VBox>
+
+            <!-- REMBOURSÉS -->
+            <VBox spacing="2" GridPane.columnIndex="2" GridPane.rowIndex="0"
+                  style="-fx-background-color: #eaf4fb; -fx-background-radius: 8; -fx-padding: 10;">
+                <Label text="🔄 Remboursés" style="-fx-text-fill: #2980b9; -fx-font-size: 11px;"/>
+                <Label fx:id="pretsRemboursesLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+            </VBox>
+
+            <!-- REJETÉS -->
+            <VBox spacing="2" GridPane.columnIndex="3" GridPane.rowIndex="0"
+                  style="-fx-background-color: #fdeeee; -fx-background-radius: 8; -fx-padding: 10;">
+                <Label text="❌ Rejetés" style="-fx-text-fill: #e74c3c; -fx-font-size: 11px;"/>
+                <Label fx:id="pretsRejetesLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+            </VBox>
+        </GridPane>
+    </VBox>
+
+    <!-- ===================================================== -->
+    <!-- GRAPHIQUES (Réduits) -->
+    <!-- ===================================================== -->
+
+    <HBox spacing="15" alignment="CENTER">
+
+        <!-- GRAPHIQUE STATUT -->
+        <VBox spacing="6" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="Statut" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <PieChart fx:id="statutPieChart" prefHeight="180" prefWidth="240" labelsVisible="true" legendVisible="true"/>
+        </VBox>
+
+        <!-- GRAPHIQUE AGENCE -->
+        <VBox spacing="6" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
+            <Label text="Agence" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <PieChart fx:id="agencePieChart" prefHeight="180" prefWidth="240" labelsVisible="true" legendVisible="true"/>
+        </VBox>
+
     </HBox>
 
 </VBox>
