@@ -5,7 +5,9 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import said.microgest.config.HibernateUtil;
 import said.microgest.entities.User;
+import said.microgest.enums.Role;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,10 +16,101 @@ public class UserRepository {
     private final EntityManager em = HibernateUtil.getEntityManager();
 
     public List<User> findAll() {
-        return em.createQuery(
-                "SELECT u FROM User u ORDER BY u.nom, u.prenom",
-                User.class
-        ).getResultList();
+        try {
+            em.clear();
+            return em.createQuery(
+                    "SELECT u FROM User u ORDER BY u.nom, u.prenom",
+                    User.class
+            ).getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<User> findPaginated(int page, int size) {
+        try {
+            em.clear();
+            return em.createQuery(
+                            "SELECT u FROM User u ORDER BY u.nom, u.prenom",
+                            User.class
+                    )
+                    .setFirstResult((page - 1) * size)
+                    .setMaxResults(size)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public long count() {
+        try {
+            em.clear();
+            return em.createQuery(
+                    "SELECT COUNT(u) FROM User u",
+                    Long.class
+            ).getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public long countByRole(Role role) {
+        try {
+            em.clear();
+            return em.createQuery(
+                            "SELECT COUNT(u) FROM User u WHERE u.role = :role",
+                            Long.class
+                    ).setParameter("role", role)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public long countActifsByRole(Role role) {
+        try {
+            em.clear();
+            return em.createQuery(
+                            "SELECT COUNT(u) FROM User u WHERE u.role = :role AND u.actif = true",
+                            Long.class
+                    ).setParameter("role", role)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public List<User> findByRole(Role role) {
+        try {
+            em.clear();
+            return em.createQuery(
+                            "SELECT u FROM User u WHERE u.role = :role ORDER BY u.nom, u.prenom",
+                            User.class
+                    ).setParameter("role", role)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<User> search(String keyword) {
+        try {
+            em.clear();
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            return em.createQuery("""
+                    SELECT u FROM User u
+                    WHERE LOWER(u.nom) LIKE :q
+                       OR LOWER(u.prenom) LIKE :q
+                       OR LOWER(u.username) LIKE :q
+                       OR LOWER(u.email) LIKE :q
+                    ORDER BY u.nom
+                    """, User.class)
+                    .setParameter("q", pattern)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public Optional<User> findById(int id) {
@@ -70,25 +163,7 @@ public class UserRepository {
         } catch (NoResultException e) {
 
             return Optional.empty();
-
         }
-
-    }
-
-    public List<User> search(String keyword) {
-
-        String pattern = "%" + keyword.toLowerCase() + "%";
-
-        return em.createQuery("""
-                SELECT u FROM User u
-                WHERE LOWER(u.nom) LIKE :q
-                   OR LOWER(u.prenom) LIKE :q
-                   OR LOWER(u.username) LIKE :q
-                   OR LOWER(u.email) LIKE :q
-                ORDER BY u.nom
-                """, User.class)
-                .setParameter("q", pattern)
-                .getResultList();
     }
 
     public User save(User user) {
@@ -152,14 +227,4 @@ public class UserRepository {
             throw new RuntimeException("Erreur lors de la suppression de l'utilisateur.", e);
         }
     }
-
-    public long count() {
-
-        return em.createQuery(
-                "SELECT COUNT(u) FROM User u",
-                Long.class
-        ).getSingleResult();
-
-    }
-
 }

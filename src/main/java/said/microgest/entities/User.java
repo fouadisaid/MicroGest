@@ -39,4 +39,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean actif = true;
+
+    public String getFullName() {
+        return this.prenom + " " + this.nom.toUpperCase();
+    }
 }
