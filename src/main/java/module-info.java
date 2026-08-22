@@ -9,6 +9,9 @@ module said.microgest {
     requires jbcrypt;
 
     requires static lombok;
+    requires com.github.librepdf.openpdf;
+    requires jakarta.mail;
+    requires java.desktop;
 
     opens said.microgest to javafx.fxml;
     opens said.microgest.controllers to javafx.fxml;

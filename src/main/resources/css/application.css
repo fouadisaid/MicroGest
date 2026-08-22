@@ -119,7 +119,13 @@
 .table-row-cell {
     -fx-background-color: white;
     -fx-border-color: #ecf0f1;
-    -fx-padding: 4 0 4 0;
+    -fx-padding: 0;
+    -fx-cell-size: 32px;
+}
+
+.table-cell {
+    -fx-padding: 6 8 6 8;
+    -fx-alignment: CENTER-LEFT;
 }
 
 .table-row-cell:selected {
@@ -134,7 +140,6 @@
 .table-row-cell:hover {
     -fx-background-color: #ebf5fb;
 }
-
 
 .date-picker {
     -fx-background-color: white;
@@ -263,3 +268,4 @@
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
+

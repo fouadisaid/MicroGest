@@ -927,4 +927,27 @@ public class PretController {
             rembourserButton.setDisable(!valide);
         }
     }
+
+    @FXML
+    private void handleVerifierEcheances() {
+
+        try {
+
+            List<Pret> notifies = pretService.verifierEcheancesProches(7);
+
+            AlertUtil.information(
+                    "Rappels envoyés",
+                    notifies.isEmpty()
+                            ? "Aucune échéance proche à signaler pour le moment."
+                            : notifies.size() + " rappel(s) d'échéance envoyé(s) par email."
+            );
+
+        } catch (Exception e) {
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible de vérifier les échéances : " + e.getMessage()
+            );
+        }
+    }
 }

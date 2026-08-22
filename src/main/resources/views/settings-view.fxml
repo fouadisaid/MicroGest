@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="said.microgest.controllers.SettingsController"
+      stylesheets="/css/application.css">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label fx:id="userLabel" text="⚙️ Paramétrage" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <Separator/>
+
+    <GridPane hgap="15" vgap="15">
+        <padding>
+            <Insets top="10" bottom="10"/>
+        </padding>
+
+        <!-- Informations générales -->
+        <Label text="INFORMATIONS GÉNÉRALES" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2"
+               style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <Label text="Nom application :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="appNameField" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="300"/>
+
+        <Label text="Société :" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="companyField" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="300"/>
+
+        <!-- Coordonnées -->
+        <Label text="COORDONNÉES" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2"
+               style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <Label text="Email :" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="4" prefWidth="300"/>
+
+        <Label text="Téléphone :" GridPane.columnIndex="0" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="5" prefWidth="300"/>
+
+        <Label text="Adresse :" GridPane.columnIndex="0" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="addressField" GridPane.columnIndex="1" GridPane.rowIndex="6" prefWidth="300"/>
+
+        <!-- Options -->
+        <Label text="OPTIONS" GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2"
+               style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <CheckBox fx:id="notificationCheck" text="Activer les notifications" GridPane.columnIndex="0" GridPane.rowIndex="8" GridPane.columnSpan="2"/>
+
+        <CheckBox fx:id="autoSaveCheck" text="Activer la sauvegarde automatique" GridPane.columnIndex="0" GridPane.rowIndex="9" GridPane.columnSpan="2"/>
+
+    </GridPane>
+
+    <Separator/>
+
+    <HBox spacing="10">
+        <Button text="💾 Enregistrer" onAction="#handleSave" styleClass="btn-success"/>
+        <Button text="↺ Réinitialiser" onAction="#handleReset" styleClass="btn-secondary"/>
+    </HBox>
+
+</VBox>

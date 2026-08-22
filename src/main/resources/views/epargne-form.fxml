@@ -233,6 +233,16 @@
         <HBox spacing="10"
               alignment="CENTER_RIGHT">
 
+            <Button fx:id="envoyerReleveButton"
+                    text="Envoyer le relevé par email"
+                    onAction="#handleEnvoyerReleve"
+                    disable="true"
+                    style="-fx-background-color: #2980b9;
+                           -fx-text-fill: white;
+                           -fx-padding: 6 16 6 16;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
             <Button text="Fermer"
                     onAction="#handleCloseDetail"
                     style="-fx-padding: 6 16 6 16;"/>

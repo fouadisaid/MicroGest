@@ -8,7 +8,7 @@
     <persistence-unit name="MicroGestPU" transaction-type="RESOURCE_LOCAL">
 
         <class>said.microgest.entities.User</class>
-        <class>said.microgest.entities.Rembourssement</class>
+        <class>said.microgest.entities.Remboursement</class>
         <class>said.microgest.entities.Adherent</class>
         <class>said.microgest.entities.Agence</class>
         <class>said.microgest.entities.Epargne</class>

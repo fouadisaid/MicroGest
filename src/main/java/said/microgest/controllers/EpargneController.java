@@ -17,7 +17,10 @@ import said.microgest.entities.Epargne;
 import said.microgest.entities.Operation;
 import said.microgest.services.EpargneService;
 import said.microgest.utils.AlertUtil;
+import said.microgest.utils.EmailUtil;
+import said.microgest.utils.PdfExporter;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -58,6 +61,8 @@ public class EpargneController {
     @FXML private TableColumn<Operation, String> opDateColumn;
     @FXML private TableColumn<Operation, String> opObservationColumn;
 
+    @FXML private Button envoyerReleveButton;
+
     private final EpargneService epargneService = new EpargneService();
 
     private final DateTimeFormatter dateFormatter =
@@ -70,6 +75,8 @@ public class EpargneController {
     private int pageSize = 10;
     private long totalRecords = 0;
     private int totalPages = 1;
+
+    private Epargne epargneCourante;
 
     @FXML
     public void initialize() {
@@ -362,7 +369,7 @@ public class EpargneController {
         try {
 
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/epargne-view.fxml")
+                    getClass().getResource("/views/epargne-form.fxml")
             );
 
             Parent root = loader.load();
@@ -393,6 +400,8 @@ public class EpargneController {
     }
 
     public void setEpargneDetail(Epargne epargne) {
+
+        this.epargneCourante = epargne;
 
         if (listPane == null || detailPane == null) {
             return;
@@ -426,6 +435,12 @@ public class EpargneController {
                 String.format("%,.0f FCFA", epargne.getSolde())
         );
 
+        boolean aEmail = epargne.getAdherent() != null &&
+                epargne.getAdherent().getEmail() != null &&
+                !epargne.getAdherent().getEmail().isBlank();
+
+        envoyerReleveButton.setDisable(!aEmail);
+
         try {
 
             List<Operation> historique =
@@ -438,6 +453,50 @@ public class EpargneController {
             AlertUtil.error(
                     "Erreur",
                     "Impossible de charger l'historique : " + e.getMessage()
+            );
+        }
+    }
+
+    @FXML
+    private void handleEnvoyerReleve() {
+
+        if (epargneCourante == null || epargneCourante.getAdherent() == null) {
+            return;
+        }
+
+        try {
+
+            envoyerReleveButton.setDisable(true);
+
+            File pdf = PdfExporter.genererRelevePdf(
+                    epargneCourante.getAdherent(),
+                    epargneCourante,
+                    operationTable.getItems()
+            );
+
+            EmailUtil.envoyerReleve(
+                    epargneCourante.getAdherent(),
+                    epargneCourante,
+                    pdf,
+                    () -> {
+                        pdf.delete();
+                        envoyerReleveButton.setDisable(false);
+                        AlertUtil.information("Succès", "Le relevé a été envoyé par email.");
+                    },
+                    (ex) -> {
+                        pdf.delete();
+                        envoyerReleveButton.setDisable(false);
+                        AlertUtil.error("Erreur", "Échec de l'envoi de l'email : " + ex.getMessage());
+                    }
+            );
+
+        } catch (Exception e) {
+
+            envoyerReleveButton.setDisable(false);
+
+            AlertUtil.error(
+                    "Erreur",
+                    "Impossible de générer le relevé : " + e.getMessage()
             );
         }
     }

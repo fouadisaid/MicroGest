@@ -7,6 +7,8 @@ import said.microgest.enums.StatutAdherent;
 import said.microgest.repositories.AdherentRepository;
 import said.microgest.repositories.AgenceRepository;
 import said.microgest.repositories.EpargneRepository;
+import said.microgest.utils.EmailUtil;
+//import said.microgest.utils.EmailUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -173,6 +175,16 @@ public class AdherentService {
                         .build();
 
         epargneRepository.save(epargne);
+
+        // =========================================================
+        // ENVOI EMAIL DE BIENVENUE
+        // =========================================================
+        try {
+            EmailUtil.envoyerBienvenue(saved);
+
+        } catch (Exception e) {
+            System.err.println("⚠️ Erreur lors de l'envoi de l'email de bienvenue : " + e.getMessage());
+        }
 
         return saved;
     }
